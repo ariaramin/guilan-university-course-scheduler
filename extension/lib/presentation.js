@@ -51,13 +51,60 @@ function examDay(date) {
 }
 
 export function formatExam(exam) {
-  const location = exam?.location || 'مکان امتحان هنوز اعلام نشده است';
-  if (!exam?.date || exam.start == null || exam.end == null) {
-    return persianDigits(`${location}\nزمان امتحان هنوز اعلام نشده است`);
+  if (!exam) return 'زمان امتحان اعلام نشده است';
+
+  let location = (exam.location || '').trim();
+  if (['نامشخص', 'اعلام نشده', 'ندارد'].some((x) => location.includes(x))) {
+    location = '';
   }
-  const day = examDay(exam.date);
-  const date = persianDigits(exam.date.replaceAll('-', '/'));
-  return persianDigits(`${location} — ${day ? `روز ${day}، ` : ''}${date}، ساعت ${clock(exam.start)} تا ${clock(exam.end)}`);
+
+  const hasTime = exam.date && exam.start != null;
+  if (!hasTime && !location) return 'زمان و مکان امتحان اعلام نشده است';
+
+  const parts = [];
+
+  if (hasTime) {
+    const day = examDay(exam.date);
+    const date = persianDigits(exam.date.replaceAll('-', '/'));
+
+    const startStr = clock(exam.start);
+    const endStr = exam.end != null ? clock(exam.end) : null;
+    const timeStr = endStr ? `ساعت ${startStr} تا ${endStr}` : `ساعت ${startStr}`;
+
+    const dateParts = [];
+    if (day) dateParts.push(day);
+    if (date) dateParts.push(date);
+    const dateFullStr = dateParts.join(' ');
+
+    const timeDetails = `${dateFullStr} ${timeStr}`.trim();
+    if (timeDetails) parts.push(timeDetails);
+  }
+
+  if (location) {
+    const normalizedLoc = location.replace(/\s+/g, ' ');
+    const isRedundant = hasTime && parts.some(p => normalizedLoc.includes(p));
+    if (!isRedundant) {
+      if (hasTime) {
+        parts.push(`(${location})`);
+      } else {
+        parts.push(location);
+      }
+    }
+  }
+
+  return persianDigits(parts.join(' '));
+}
+
+export function formatDuration(totalMinutes) {
+  if (totalMinutes == null || totalMinutes <= 0) return 'بدون فاصله';
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} ساعت`);
+  if (minutes > 0) parts.push(`${minutes} دقیقه`);
+  
+  return persianDigits(parts.join(' و '));
 }
 
 export function formatCapacity(value) {

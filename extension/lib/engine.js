@@ -91,6 +91,7 @@ export function generateSchedules(groups, options = {}) {
     prioritizeChart = true,
   } = options;
   const targetUnits = options.targetUnits ?? options.maxUnits ?? 20;
+  const targetCount = options.targetCount ?? null;
   const required = new Set(requiredGroupIds);
   const preferred = new Set(preferredGroupIds);
   const schedulableGroups = groups.filter((group) => group.unitsKnown !== false);
@@ -129,7 +130,8 @@ export function generateSchedules(groups, options = {}) {
           continue;
         }
         const units = state.units + group.units;
-        if (state.groups.length >= maxCourses || units > maxUnits || state.groupIds.some((id) => conflicts.get(group.id).has(id))) continue;
+        const maxAllowedCourses = targetCount ?? maxCourses;
+        if (state.groups.length >= maxAllowedCourses || units > maxUnits || state.groupIds.some((id) => conflicts.get(group.id).has(id))) continue;
         next.push({
           groups: [...state.groups, group],
           groupIds: [...state.groupIds, group.id],
@@ -152,6 +154,7 @@ export function generateSchedules(groups, options = {}) {
   const signatures = new Set();
   return states.flatMap((state) => {
     if (!state.groups.length || state.units < minUnits) return [];
+    if (targetCount != null && state.groups.length !== targetCount) return [];
     if (![...required].every((id) => state.groupIds.includes(id))) return [];
     const selectedCourseIds = state.groups.map((group) => group.courseId);
     const checks = state.groups.map((group) => eligibility(group, { passedCourseIds, selectedCourseIds }));

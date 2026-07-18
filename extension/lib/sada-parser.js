@@ -1,13 +1,13 @@
 import { minutes, normalizeSourceText } from './normalize.js';
 
 const fieldAliases = {
-  title: ['نام درس'],
-  instructor: ['استاد'],
-  schedule: ['برنامه زمانی'],
-  exam: ['زمان امتحان'],
+  title: ['نام درس', 'عنوان درس', 'درس'],
+  instructor: ['استاد', 'نام استاد'],
+  schedule: ['برنامه زمانی', 'زمان کلاس', 'برنامه زمانی کلاس', 'برنامه کلاس'],
+  exam: ['زمان امتحان', 'تاریخ امتحان', 'مکان امتحان'],
   courseId: ['کد درس'],
   units: ['تعداد واحد', 'واحد'],
-  capacity: ['ظرفیت مانده', 'ظرفیت باقیمانده'],
+  capacity: ['ظرفیت مانده', 'ظرفیت باقیمانده', 'ظرفیت'],
   tuition: ['شهریه'],
   degree: ['مقطع'],
   term: ['ترم'],
@@ -153,14 +153,46 @@ function stableTextId(value) {
   return normalizedText(value).replace(/\s+/g, '-');
 }
 
-export function parseSadaTables(tables) {
-  const table = tables.find(({ rows }) => {
-    const headers = rows[0] ?? [];
-    const indexes = columnIndexes(headers);
-    return indexes.title >= 0 && indexes.schedule >= 0;
-  });
-  if (!table) return { groups: [], error: 'جدول دروس ارائه‌شده با سرستون‌های شناخته‌شده پیدا نشد.' };
+export function scoreSadaTable(table) {
+  const headers = table.rows[0] ?? [];
+  const indexes = columnIndexes(headers);
+  let score = 0;
 
+  if (indexes.title >= 0) score += 20;
+  if (indexes.schedule >= 0) score += 20;
+  if (indexes.instructor >= 0) score += 10;
+  if (indexes.exam >= 0) score += 10;
+  if (indexes.capacity >= 0) score += 10;
+  if (indexes.degree >= 0) score += 10;
+  if (indexes.term >= 0) score += 10;
+  if (indexes.tuition >= 0) score += 10;
+  if (indexes.gender >= 0) score += 10;
+  if (indexes.courseId >= 0) score += 10;
+  if (indexes.units >= 0) score += 10;
+
+  if (indexes.title >= 0 && indexes.schedule >= 0) score += 15;
+  if (headers.length >= 5 && headers.length <= 15) score += 5;
+  if (table.rows.length > 1) score += 5;
+
+  return score;
+}
+
+export function parseSadaTables(tables) {
+  let bestTable = null;
+  let maxScore = -1;
+  for (const table of tables) {
+    const score = scoreSadaTable(table);
+    if (score > maxScore) {
+      maxScore = score;
+      bestTable = table;
+    }
+  }
+
+  if (!bestTable || maxScore < 25) {
+    return { groups: [], error: 'جدول دروس ارائه‌شده با سرستون‌های شناخته‌شده پیدا نشد.' };
+  }
+
+  const table = bestTable;
   const headers = table.rows[0];
   const indexes = columnIndexes(headers);
   const warnings = [];

@@ -10,12 +10,12 @@ test('formats class sessions with Persian days, digits, and wording', () => {
 test('formats Jalali exam date with its full Persian weekday', () => {
   assert.equal(
     formatExam({ date: '1405-04-25', start: 840, end: 1020, location: 'دانشکده فنی' }),
-    'دانشکده فنی — روز پنجشنبه، ۱۴۰۵/۰۴/۲۵، ساعت ۱۴ تا ۱۷',
+    'پنجشنبه ۱۴۰۵/۰۴/۲۵ ساعت ۱۴ تا ۱۷ (دانشکده فنی)',
   );
 });
 
 test('uses human messages for incomplete exam, capacity, and tuition data', () => {
-  assert.equal(formatExam(null), 'مکان امتحان هنوز اعلام نشده است\nزمان امتحان هنوز اعلام نشده است');
+  assert.equal(formatExam(null), 'زمان امتحان اعلام نشده است');
   assert.equal(formatCapacity(0), 'ظرفیت تکمیل شده است');
   assert.equal(formatCapacity(-1), 'وضعیت ظرفیت نامشخص است');
   assert.equal(formatTuition({ amount: 1000, currency: null }), 'شهریه اعلام نشده است');

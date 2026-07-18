@@ -23,6 +23,22 @@ export function normalizeCourseAlias(value) {
     .trim();
 }
 
+const COURSE_ALIASES = [
+  { canonical: 'زبان فارسی', aliases: ['فارسی', 'درس فارسی', 'فارسی عمومی', 'زبان فارسی عمومی'] },
+  { canonical: 'آزمایشگاه فیزیک ۱', aliases: ['آزمایشگاه فیزیک یک', 'آز فیزیک ۱', 'آز فیزیک یک'] },
+  { canonical: 'اندیشه اسلامی ۱', aliases: ['اندیشه اسلامی یک'] },
+];
+
+function getCanonicalName(normalizedName) {
+  for (const group of COURSE_ALIASES) {
+    const canonicalNormalized = normalizeCourseAlias(group.canonical);
+    if (canonicalNormalized === normalizedName || group.aliases.some(alias => normalizeCourseAlias(alias) === normalizedName)) {
+      return canonicalNormalized;
+    }
+  }
+  return normalizedName;
+}
+
 export function validUnits(value) {
   const units = Number(englishDigits(value));
   if (!Number.isFinite(units) || units <= 0 || units > 10) {
@@ -99,7 +115,7 @@ export function parseCourseUnitFile(text, fileName = '') {
   }
   const unitsByName = new Map();
   for (const [name, units] of rawEntries) {
-    const normalizedName = normalizeCourseName(name ?? '');
+    const normalizedName = getCanonicalName(normalizeCourseAlias(name ?? ''));
     if (!normalizedName) throw new TypeError('یکی از ردیف‌های فایل نام درس ندارد.');
     const value = validUnits(units);
     if (unitsByName.has(normalizedName) && unitsByName.get(normalizedName) !== value) {
@@ -112,7 +128,8 @@ export function parseCourseUnitFile(text, fileName = '') {
 
 export function applyCourseUnits(groups, unitsByName) {
   return groups.map((group) => {
-    const units = unitsByName.get(normalizeCourseName(group.title));
+    const normalizedName = getCanonicalName(normalizeCourseAlias(group.title));
+    const units = unitsByName.get(normalizedName);
     const sourceKnown = group.unitsKnown === true && Number(group.units) > 0;
     return {
       ...group,
