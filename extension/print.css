@@ -1,0 +1,29 @@
+@font-face{font-family:Vazirmatn;font-style:normal;font-display:swap;font-weight:400;src:url("fonts/vazirmatn-arabic-400-normal.woff2") format("woff2")}
+@font-face{font-family:Vazirmatn;font-style:normal;font-display:swap;font-weight:600;src:url("fonts/vazirmatn-arabic-600-normal.woff2") format("woff2")}
+
+:root { --ink: #0f172a; --muted: #526172; --border: #cbd5e1; --surface: #f1f5f9; --primary: #1e40af; --logo-width: 14mm; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: #fff; font: 400 10pt/1.65 Vazirmatn, sans-serif; }
+#print-status { margin: 16px; padding: 10px 14px; color: var(--primary); background: #eff6ff; border: 1px solid #c7d5f3; border-radius: 6px; }
+#print-status[data-kind="error"] { color: #b42318; background: #fff0ee; }
+.program { width: 100%; margin: 0 auto; padding: 12mm 10mm; break-after: page; }
+.program:last-child { break-after: auto; }
+.print-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--primary); }
+.print-header > img { width: var(--logo-width); height: auto; flex: 0 0 auto; object-fit: contain; background: #fff; }
+.print-identity { flex: 1; }
+.print-header p, .print-header h1 { margin: 0; }
+.print-header p { color: var(--muted); font-size: 9pt; }
+.print-header h1 { font-size: 16pt; }
+.print-meta { margin: 10px 0; color: var(--muted); }
+h2 { margin: 16px 0 8px; font-size: 12pt; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; direction: rtl; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th, td { padding: 6px; vertical-align: top; text-align: right; white-space: pre-line; overflow-wrap: anywhere; border: 1px solid var(--border); }
+th { color: #334155; background: var(--surface); font-weight: 600; }
+th:nth-child(1), td:nth-child(1) { width: 14%; }
+th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { width: 18%; }
+.print-notice { margin: 10px 0 0; padding-top: 6px; color: var(--muted); border-top: 1px solid var(--border); font-size: 8pt; }
+
+@page { size: A4 landscape; margin: 8mm; }
+@media print { #print-status { display: none; }.program { padding: 0; } }
