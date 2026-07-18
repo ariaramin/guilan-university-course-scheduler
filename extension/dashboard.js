@@ -1,7 +1,7 @@
 import { parseChartFile, reconcileChart } from './lib/chart-parser.js';
 import { readCachedCourseDataset } from './lib/course-cache.js';
 import { normalizeCourseName, validUnits } from './lib/course-units.js';
-import { groupsConflict } from './lib/engine.js';
+
 import { createRequestGate } from './lib/freshness.js';
 import { englishDigits, normalizeGroup } from './lib/normalize.js';
 import { buildPrintModel } from './lib/print-model.js';
@@ -14,6 +14,7 @@ import {
 import { groupedRows, variableVisibleRange } from './lib/virtual-list.js';
 
 const $ = (selector) => document.querySelector(selector);
+$('#app-version').textContent = `نسخه ${persianDigits(chrome.runtime.getManifest().version)}`;
 const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
 const chartLabels = {
   matched: 'تطبیق قطعی', probable_match: 'تطبیق احتمالی', not_in_chart: 'خارج از چارت',
@@ -125,16 +126,14 @@ function passedIds() {
   return [...new Set(groups.filter((group) => names.has(groupSearchIndex.get(group.id).title)).map((group) => group.courseId))];
 }
 
-function hasConflict(group) {
-  return groups.some((selected) => selected.id !== group.id && requiredGroupIds.has(selected.id) && groupsConflict(group, selected));
-}
+
 
 function filterGroups() {
   const key = [
     groupsVersion, $('#title-filter').value, $('#instructor-filter').value, $('#day-filter').value,
     $('#unit-filter').value, $('#degree-filter').value, $('#term-filter').value, $('#gender-filter').value,
     $('#chart-filter').value, $('#sort-by').value, $('#passed-courses').value,
-    $('#capacity-only').checked, $('#conflict-free').checked, $('#show-full').checked,
+    $('#capacity-only').checked, $('#show-full').checked,
     [...requiredGroupIds].sort().join(','),
   ].join('\u0000');
   if (key === filterCache.key) return filterCache.value;
@@ -156,7 +155,7 @@ function filterGroups() {
     genderMatchesFilter(group, gender) &&
     (!chart || (chart === 'matched' ? confirmedChartCourseIds.has(group.courseId) : !confirmedChartCourseIds.has(group.courseId))) &&
     (!$('#capacity-only').checked || (group.capacity ?? 0) > 0) &&
-    (!$('#conflict-free').checked || !hasConflict(group)) &&
+
     ($('#show-full').checked || group.available !== false) &&
     !passed.has(groupSearchIndex.get(group.id).title),
   );
@@ -219,8 +218,7 @@ function courseRow(group) {
     titleMeta.append(node('span', 'gender-badge', group.genderEligibility === 'male' ? 'ویژه آقایان' : 'ویژه بانوان'));
   } else if (group.genderEligibility === 'ambiguous') titleMeta.append(node('span', 'gender-badge', 'جنسیت مبهم'));
   if (titleMeta.children.length) titleCell.append(titleMeta);
-  const conflict = hasConflict(group);
-  if (group.available === false || conflict) titleCell.append(node('span', 'course-reason', group.available === false ? 'ظرفیت این درس تکمیل شده است.' : 'با یکی از انتخاب‌های اجباری تداخل دارد.'));
+  if (group.available === false) titleCell.append(node('span', 'course-reason', 'ظرفیت این درس تکمیل شده است.'));
   const instructor = node('div', 'cell', group.instructor || 'اعلام نشده');
   const time = node('div', 'cell cell-time', formatSessions(group.sessions));
   const exam = node('div', 'cell cell-exam', formatExam(group.exam));
@@ -373,6 +371,12 @@ function targetUnits() {
   return Number.isInteger(value) && value >= 1 && value <= 30 ? value : null;
 }
 
+function targetCount() {
+  const raw = englishDigits($('#target-count').value).trim();
+  const value = raw === '' ? null : Number(raw);
+  return Number.isInteger(value) && value >= 1 && value <= 15 ? value : null;
+}
+
 function abortWorker() {
   activeWorker?.terminate(); activeWorker = null; runId += 1;
   $('#generation-indicator').dataset.loading = 'false';
@@ -402,7 +406,7 @@ function renderActiveFilters() {
     ['gender-filter', 'جنسیت', $('#gender-filter').selectedOptions[0]?.textContent, $('#gender-filter').value !== ''],
     ['chart-filter', 'چارت', $('#chart-filter').selectedOptions[0]?.textContent, $('#chart-filter').value !== ''],
     ['capacity-only', 'دارای ظرفیت', '', $('#capacity-only').checked],
-    ['conflict-free', 'بدون تداخل', '', $('#conflict-free').checked], ['show-full', 'تکمیل‌ظرفیت', '', $('#show-full').checked],
+    ['show-full', 'تکمیل‌ظرفیت', '', $('#show-full').checked],
   ];
   const fragment = document.createDocumentFragment();
   for (const [id, label, value, active = Boolean(value)] of definitions) {
@@ -411,18 +415,28 @@ function renderActiveFilters() {
     const clear = node('button', '', '×'); clear.type = 'button'; clear.dataset.clearFilter = id; clear.setAttribute('aria-label', `حذف فیلتر ${label}`); chip.append(clear); fragment.append(chip);
   }
   $('#active-filters').replaceChildren(fragment);
+
+  const advancedSummary = document.querySelector('.advanced-filters summary');
+  const hasAdvancedActive = $('#target-count').value.trim() !== '';
+  if (hasAdvancedActive && !advancedSummary.querySelector('.active-dot')) {
+    const dot = document.createElement('span');
+    dot.className = 'active-dot';
+    advancedSummary.append(dot);
+  } else if (!hasAdvancedActive) {
+    advancedSummary.querySelector('.active-dot')?.remove();
+  }
 }
 
 async function savePreferences() {
   await chrome.storage.local.set({
     plannerPreferences: {
-      targetUnits: englishDigits($('#target-units').value), title: $('#title-filter').value,
+      targetUnits: englishDigits($('#target-units').value), targetCount: englishDigits($('#target-count').value), title: $('#title-filter').value,
       instructor: $('#instructor-filter').value, day: $('#day-filter').value,
       unit: $('#unit-filter').value, degree: $('#degree-filter').value, term: $('#term-filter').value,
       gender: $('#gender-filter').value, chartFilter: $('#chart-filter').value,
       sort: $('#sort-by').value, group: $('#group-by').value, passed: $('#passed-courses').value,
       showFull: $('#show-full').checked,
-      capacityOnly: $('#capacity-only').checked, conflictFree: $('#conflict-free').checked,
+      capacityOnly: $('#capacity-only').checked,
       prioritizeChart: $('#prioritize-chart').checked,
       requiredGroupIds: [...requiredGroupIds], preferredGroupIds: [...preferredGroupIds], excludedGroupIds: [...excludedGroupIds],
     },
@@ -433,13 +447,12 @@ function generate(items, target) {
   abortWorker();
   const currentRun = runId;
   $('#generation-indicator').textContent = 'در حال ساخت برنامه‌ها…';
+  const targetUnits = target;
+  const count = targetCount();
   $('#generation-indicator').dataset.loading = 'true';
   $('#results').setAttribute('aria-busy', 'true');
   setStatus('در حال ساخت برنامه‌ها…');
-  try { activeWorker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' }); } catch {
-    $('#generation-indicator').textContent = 'محاسبه برنامه‌ها شروع نشد.'; $('#generation-indicator').dataset.loading = 'false'; $('#results').setAttribute('aria-busy', 'false');
-    setStatus('دریافت پیشنهادها با مشکل روبه‌رو شد. افزونه را دوباره بارگذاری کنید.', 'error'); return;
-  }
+  activeWorker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
   activeWorker.onmessage = ({ data }) => {
     if (currentRun !== runId) return;
     activeWorker?.terminate(); activeWorker = null;
@@ -462,7 +475,7 @@ function generate(items, target) {
     setStatus('دریافت پیشنهادها با مشکل روبه‌رو شد. داده‌ها محفوظ‌اند؛ دوباره تلاش کنید.', 'error');
   };
   activeWorker.postMessage({ groups: items, options: {
-    targetUnits: target, maxUnits: 30, maxCourses: 10,
+    targetUnits: target, targetCount: count, maxUnits: 30, maxCourses: 15,
     requiredGroupIds: [...requiredGroupIds], preferredGroupIds: [...preferredGroupIds],
     passedCourseIds: passedIds(), limit: 20, prioritizeChart: $('#prioritize-chart').checked,
   } });
@@ -690,17 +703,7 @@ function download(content, type, name) {
   const link = Object.assign(document.createElement('a'), { href: url, download: name }); link.click(); URL.revokeObjectURL(url);
 }
 
-function csv() {
-  const quote = (value) => `"${String(value).replaceAll('"', '""')}"`;
-  const rows = [['برنامه', 'مجموع واحد', 'نام درس', 'استاد', 'برنامه زمانی', 'امتحان', 'مقطع و ترم', 'ظرفیت', 'شهریه'], ...exportRows()];
-  download('\uFEFF' + rows.map((row) => row.map(quote).join(',')).join('\n'), 'text/csv;charset=utf-8', 'schedules.csv');
-}
 
-function excel() {
-  const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-  const rows = [['برنامه', 'مجموع واحد', 'نام درس', 'استاد', 'برنامه زمانی', 'امتحان', 'مقطع و ترم', 'ظرفیت', 'شهریه'], ...exportRows()];
-  download('\uFEFF' + `<table>${rows.map((row) => `<tr>${row.map((value) => `<td>${escape(value)}</td>`).join('')}</tr>`).join('')}</table>`, 'application/vnd.ms-excel;charset=utf-8', 'schedules.xls');
-}
 
 async function printSchedules(items) {
   if (printing) return;
@@ -756,8 +759,9 @@ $('#course-dialog').addEventListener('click', (event) => {
 });
 
 $('#target-units').addEventListener('input', (event) => { event.target.value = persianDigits(englishDigits(event.target.value)); requestRefresh(); });
+$('#target-count').addEventListener('input', (event) => { event.target.value = persianDigits(englishDigits(event.target.value)); requestRefresh(); });
 for (const selector of ['#title-filter', '#instructor-filter', '#passed-courses']) $(selector).addEventListener('input', (event) => { event.target.value = persianDigits(event.target.value); requestRefresh(); });
-for (const selector of ['#day-filter', '#unit-filter', '#degree-filter', '#term-filter', '#gender-filter', '#chart-filter', '#sort-by', '#group-by', '#capacity-only', '#conflict-free', '#show-full', '#prioritize-chart']) $(selector).addEventListener('change', () => requestRefresh());
+for (const selector of ['#day-filter', '#unit-filter', '#degree-filter', '#term-filter', '#gender-filter', '#chart-filter', '#sort-by', '#group-by', '#capacity-only', '#show-full', '#prioritize-chart']) $(selector).addEventListener('change', () => requestRefresh());
 
 let filterReturnFocus = null;
 function setFilterSheet(open) {
@@ -919,7 +923,7 @@ $('#unit-review-list').addEventListener('click', async (event) => {
   }
 });
 
-$('#csv').addEventListener('click', csv); $('#excel').addEventListener('click', excel);
+
 
 function formattedUpdateTime(value) {
   if (!Number.isFinite(value) || value <= 0) return null;
@@ -932,10 +936,19 @@ function formattedUpdateTime(value) {
 }
 
 function errorMessage(errorCode) {
-  if (['NO_ACTIVE_TAB', 'UNSUPPORTED_PAGE'].includes(errorCode)) return 'برای دریافت دروس، صفحه فهرست دروس سامانه سادا را باز کنید.';
-  if (['CONTENT_SCRIPT_UNAVAILABLE', 'SCRIPT_INJECTION_FAILED'].includes(errorCode)) return 'برای اتصال افزونه، صفحه سامانه را یک‌بار بازخوانی کنید.';
-  if (['TABLE_NOT_FOUND', 'TABLE_NOT_READY', 'EXTRACTION_TIMEOUT'].includes(errorCode)) return 'جدول دروس هنوز آماده نشده است.';
-  return 'دریافت اطلاعات جدید ممکن نشد.';
+  if (['NO_ACTIVE_TAB', 'UNSUPPORTED_PAGE'].includes(errorCode)) {
+    return 'برای دریافت دروس، صفحه فهرست دروس سامانه سادا را باز کنید.';
+  }
+  if (['CONTENT_SCRIPT_UNAVAILABLE', 'SCRIPT_INJECTION_FAILED', 'CONTENT_SCRIPT_VERSION_MISMATCH'].includes(errorCode)) {
+    return 'برای اتصال افزونه، صفحه سامانه را یکبار بازخوانی کنید.';
+  }
+  if (['TABLE_NOT_FOUND', 'TABLE_STRUCTURE_UNSUPPORTED', 'NO_VALID_ROWS', 'PARSING_FAILED'].includes(errorCode)) {
+    return 'جدول قابلخواندن دروس در این صفحه پیدا نشد.';
+  }
+  if (['TABLE_NOT_READY', 'EXTRACTION_TIMEOUT'].includes(errorCode)) {
+    return 'دریافت اطلاعات جدید ممکن نشد؛ آخرین اطلاعات ذخیرهشده نمایش داده میشود.';
+  }
+  return 'دریافت اطلاعات جدید ممکن نشد؛ آخرین اطلاعات ذخیرهشده نمایش داده میشود.';
 }
 
 function cacheStateMessages(result) {
@@ -1036,6 +1049,15 @@ if (cachedResult.status === 'migrated') {
   await chrome.storage.local.set({ cachedCourseDataset: cachedResult.dataset });
   await chrome.storage.local.remove(['rawGroups', 'courseDataMeta', 'lastImportedAt']);
 }
+if (cachedResult.status === 'valid' || cachedResult.status === 'migrated' || cachedResult.status === 'provisional') {
+  const dataset = cachedResult.dataset;
+  if (dataset && Array.isArray(dataset.courses) && dataset.courses.length > 0) {
+    applyCourseDataset(dataset.courses, dataset.fingerprint, dataset.extractedAt ?? 0);
+    dataStatus = 'cached';
+    dataStateMessages = cacheStateMessages(cachedResult);
+    updateDataMessage();
+  }
+}
 liveRequestGate = createRequestGate();
 dataStateMessages = ['در حال دریافت آخرین فهرست دروس…'];
 chartItems = stored.chartData?.items ?? [];
@@ -1046,11 +1068,11 @@ rebuildGroups();
 if (chartItems.length) { $('#chart-file-meta').textContent = `چارت ذخیره‌شده · ${persianDigits(chartItems.length)} درس`; $('#chart-summary-action').textContent = `${persianDigits(chartItems.length)} درس آماده`; $('#remove-chart').hidden = false; $('#chart-progress').textContent = 'اطلاعات چارت ذخیره‌شده آماده است.'; chartStats(); }
 
 const preferences = stored.plannerPreferences ?? {};
-$('#target-units').value = persianDigits(preferences.targetUnits || '20'); $('#title-filter').value = preferences.title ?? ''; $('#instructor-filter').value = preferences.instructor ?? '';
+$('#target-units').value = persianDigits(preferences.targetUnits || '20'); $('#target-count').value = persianDigits(preferences.targetCount ?? ''); $('#title-filter').value = preferences.title ?? ''; $('#instructor-filter').value = preferences.instructor ?? '';
 $('#day-filter').value = preferences.day ?? ''; $('#unit-filter').value = preferences.unit ?? ''; $('#passed-courses').value = preferences.passed ?? '';
 $('#sort-by').value = preferences.sort ?? 'name'; $('#group-by').value = preferences.group ?? ''; $('#show-full').checked = preferences.showFull ?? false;
 $('#gender-filter').value = preferences.gender ?? ''; $('#chart-filter').value = preferences.chartFilter ?? (preferences.chartOnly ? 'matched' : '');
-$('#capacity-only').checked = preferences.capacityOnly ?? false; $('#conflict-free').checked = preferences.conflictFree ?? false;
+$('#capacity-only').checked = preferences.capacityOnly ?? false;
 $('#prioritize-chart').checked = preferences.prioritizeChart ?? true;
 fillFacet('#degree-filter', groups.map((group) => group.degree)); fillFacet('#term-filter', groups.map((group) => group.termId));
 $('#degree-filter').value = preferences.degree ?? ''; $('#term-filter').value = preferences.term ?? '';

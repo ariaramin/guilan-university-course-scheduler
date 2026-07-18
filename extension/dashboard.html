@@ -88,6 +88,7 @@
         <details class="advanced-filters">
           <summary>فیلترهای بیشتر</summary>
           <div class="advanced-grid">
+            <label class="target-field"><span>تعداد درس <small>اختیاری</small></span><input id="target-count" type="text" inputmode="numeric" pattern="[۰-۹٠-٩0-9]*" placeholder="مثلاً ۷"></label>
             <label><span>تعداد واحد درس</span><select id="unit-filter"><option value="">همه</option><option value="unknown">نامشخص</option><option value="1">۱</option><option value="2">۲</option><option value="3">۳</option><option value="4">۴ و بیشتر</option></select></label>
             <label><span>مرتب‌سازی</span><select id="sort-by"><option value="name">نام درس</option><option value="capacity">ظرفیت باقی‌مانده</option><option value="units">تعداد واحد</option><option value="chart">وضعیت چارت</option></select></label>
             <label><span>گروه‌بندی</span><select id="group-by"><option value="">بدون گروه‌بندی</option><option value="day">روز کلاس</option><option value="term">ترم</option><option value="degree">مقطع</option><option value="chart">وضعیت چارت</option></select></label>
@@ -95,7 +96,6 @@
             <label><span>وضعیت چارت</span><select id="chart-filter"><option value="">همه درس‌ها</option><option value="matched">در چارت شما</option><option value="unmatched">خارج از چارت</option></select></label>
             <label class="passed-field"><span>درس‌های گذرانده</span><textarea id="passed-courses" rows="2" placeholder="هر درس را در یک خط بنویسید"></textarea></label>
             <div class="advanced-checks">
-              <label class="check-field"><input id="conflict-free" type="checkbox"><span>بدون تداخل با انتخاب‌ها</span></label>
               <label class="check-field"><input id="show-full" type="checkbox"><span>نمایش تکمیل‌ظرفیت</span></label>
               <label class="check-field"><input id="prioritize-chart" type="checkbox" checked><span>اولویت با چارت</span></label>
             </div>
@@ -120,7 +120,6 @@
         <div><h2 id="suggestions-title">برنامه‌های پیشنهادی</h2><p>به‌روزرسانی خودکار با تغییر فیلترها</p></div>
         <div class="suggestion-actions">
           <span id="generation-indicator" class="generation-indicator" aria-live="polite"></span>
-          <div class="exports" aria-label="خروجی برنامه‌ها"><button id="csv" type="button" disabled>CSV</button><button id="excel" type="button" disabled>Excel</button></div>
         </div>
       </div>
       <div id="comparison" class="comparison" role="status" aria-live="polite" hidden></div>
@@ -141,6 +140,17 @@
       </div>
     </section>
   </main>
+
+  <footer class="app-footer">
+    <div class="app-footer-container">
+      <p class="app-footer-love">ساخته‌‌شده با <span aria-label="عشق">❤️</span> توسط آریا رامین</p>
+      <div class="app-footer-meta">
+        <span id="app-version" class="app-footer-version"></span>
+        <span class="divider">·</span>
+        <a href="https://github.com/ariaramin/guilan-university-course-scheduler" class="app-footer-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
 
   <dialog id="course-dialog" class="detail-drawer">
     <form method="dialog"><button class="dialog-close" aria-label="بستن جزئیات">بستن</button></form>
