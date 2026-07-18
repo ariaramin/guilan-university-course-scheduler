@@ -9,16 +9,16 @@ const html = readFileSync(new URL('../extension/dashboard.html', import.meta.url
 
 test('content extraction waits for stable rows and monitors dynamic table replacement', () => {
   assert.match(content, /MutationObserver/);
-  assert.match(content, /result\.fingerprint !== lastFingerprint/);
+  assert.match(content, /result\.fingerprint === lastPublishedFingerprint/);
   assert.match(content, /result\.rowCount > 0/);
   assert.match(content, /hasVisibleLoadingIndicator/);
-  assert.match(content, /readiness: 'timeout'|finish\(currentExtraction\(requestId, startedAt\), 'timeout'\)/);
+  assert.match(content, /readiness: 'timeout'|finish\(finalResult, 'timeout'/);
   assert.match(content, /SADA_TABLES_CHANGED/);
   assert.match(content, /connectLiveObserver\(\)/);
 });
 
 test('background handshakes, validates live tables, and atomically publishes the course dataset', () => {
-  assert.match(background, /PING_CONTENT_SCRIPT/);
+  assert.match(background, /PING_SADA_CONTENT_SCRIPT/);
   assert.match(background, /chrome\.scripting\.executeScript/);
   assert.match(background, /parseSadaTables\(extraction\.tables\)/);
   assert.match(background, /courseDatasetFingerprint\(groups\)/);

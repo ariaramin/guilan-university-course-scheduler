@@ -46,13 +46,13 @@ test('handshakes before extraction when the content script is already active', a
     tab: { id: 1, url: 'https://sada.guilan.ac.ir/Dashboard' },
     sendMessage: async (_id, message) => {
       calls.push(message.type);
-      return message.type === 'PING_CONTENT_SCRIPT'
-        ? { requestId: message.requestId, ready: true, version: '0.9.2' }
+      return message.type === 'PING_SADA_CONTENT_SCRIPT'
+        ? { type: 'PONG_SADA_CONTENT_SCRIPT', requestId: message.requestId, ready: true, version: '0.9.2' }
         : table(message.requestId);
     },
   });
   assert.equal((await app.request('ready')).errorCode, undefined);
-  assert.deepEqual(calls, ['PING_CONTENT_SCRIPT', 'EXTRACT_CURRENT_COURSES']);
+  assert.deepEqual(calls, ['PING_SADA_CONTENT_SCRIPT', 'EXTRACT_CURRENT_COURSES']);
 });
 
 test('injects once on a supported page with no receiver, then repeats the handshake', async () => {
@@ -62,9 +62,9 @@ test('injects once on a supported page with no receiver, then repeats the handsh
     tab: { id: 2, url: 'https://sada.guilan.ac.ir/Dashboard' },
     inject: async ({ files }) => { injected += 1; assert.deepEqual(files, ['lib/dom-extractor.js', 'content.js']); },
     sendMessage: async (_id, message) => {
-      if (message.type === 'PING_CONTENT_SCRIPT' && pingCount++ === 0) throw new Error('Could not establish connection. Receiving end does not exist.');
-      return message.type === 'PING_CONTENT_SCRIPT'
-        ? { requestId: message.requestId, ready: true, version: '0.9.2' }
+      if (message.type === 'PING_SADA_CONTENT_SCRIPT' && pingCount++ === 0) throw new Error('Could not establish connection. Receiving end does not exist.');
+      return message.type === 'PING_SADA_CONTENT_SCRIPT'
+        ? { type: 'PONG_SADA_CONTENT_SCRIPT', requestId: message.requestId, ready: true, version: '0.9.2' }
         : table(message.requestId);
     },
   });

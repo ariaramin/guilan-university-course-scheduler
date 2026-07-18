@@ -39,8 +39,8 @@ async function sourceTabs() {
 }
 
 async function pingContentScript(tabId, requestId) {
-  const response = await chrome.tabs.sendMessage(tabId, { type: 'PING_CONTENT_SCRIPT', requestId });
-  if (response?.requestId !== requestId || response.ready !== true || typeof response.version !== 'string') {
+  const response = await chrome.tabs.sendMessage(tabId, { type: 'PING_SADA_CONTENT_SCRIPT', requestId });
+  if (response?.requestId !== requestId || response.ready !== true || typeof response.version !== 'string' || response.type !== 'PONG_SADA_CONTENT_SCRIPT') {
     throw new LiveExtractionError('INVALID_RESPONSE', 'handshake');
   }
   return response;
@@ -73,7 +73,9 @@ async function ensureContentScript(tab, requestId, diagnostic) {
 async function commitExtraction(extraction, trigger, tab) {
   if (!extraction || extraction.requestId !== latestRequestByTab.get(tab.id)) return { requestId: extraction?.requestId, stale: true };
   if (extraction.success === false) throw new LiveExtractionError(extraction.errorCode ?? 'LIVE_EXTRACTION_FAILED', 'content_extraction');
-  if (trigger !== 'observer' && extraction.readiness !== 'stable') throw new LiveExtractionError('TABLE_NOT_READY', 'readiness');
+  if (trigger !== 'observer' && extraction.readiness !== 'stable') {
+    throw new LiveExtractionError(extraction.errorCode ?? 'TABLE_NOT_READY', 'readiness');
+  }
   if (!Array.isArray(extraction.tables) || !extraction.tables.length) throw new LiveExtractionError('TABLE_NOT_FOUND', 'table_lookup');
   if (!Number.isFinite(extraction.extractedAt) || extraction.extractedAt <= 0) throw new LiveExtractionError('INVALID_RESPONSE', 'timestamp');
 

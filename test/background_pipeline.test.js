@@ -30,8 +30,8 @@ test('live background pipeline replaces stale cache, rejects late responses, and
     tabs: {
       query: async () => [{ id: 7, active: true }],
       get: async () => ({ id: 7, url: 'https://sada.guilan.ac.ir/Dashboard' }),
-      sendMessage: (_tabId, message) => message.type === 'PING_CONTENT_SCRIPT'
-        ? Promise.resolve({ requestId: message.requestId, ready: true, version: '0.9.2' })
+      sendMessage: (_tabId, message) => message.type === 'PING_SADA_CONTENT_SCRIPT'
+        ? Promise.resolve({ type: 'PONG_SADA_CONTENT_SCRIPT', requestId: message.requestId, ready: true, version: '0.9.2' })
         : new Promise((resolve) => pending.set(message.requestId, resolve)),
     },
     scripting: { executeScript: async () => {} },

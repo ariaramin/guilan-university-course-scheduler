@@ -12,6 +12,16 @@
   globalThis.__guilanPlannerContent = { version: CONTENT_VERSION };
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type === 'PING_SADA_CONTENT_SCRIPT') {
+      sendResponse({
+        type: 'PONG_SADA_CONTENT_SCRIPT',
+        requestId: message.requestId,
+        ready: true,
+        version: CONTENT_VERSION,
+        pageUrl: location.href,
+      });
+      return;
+    }
     if (message?.type === 'PING_CONTENT_SCRIPT') {
       sendResponse({ requestId: message.requestId, ready: true, version: CONTENT_VERSION });
       return;
@@ -20,7 +30,7 @@
     void waitForStableExtraction(message.requestId ?? crypto.randomUUID())
       .then((result) => sendResponse(result.readiness === 'stable'
         ? { ...result, success: true }
-        : { requestId: message.requestId, success: false, errorCode: 'EXTRACTION_TIMEOUT', ...pageMetadata() }))
+        : { requestId: message.requestId, success: false, errorCode: result.errorCode ?? 'EXTRACTION_TIMEOUT', ...pageMetadata() }))
       .catch((error) => {
         if (globalThis.__SADA_DEBUG_LIVE__) console.debug('SADA content extraction', { requestId: message.requestId, technicalError: error.message });
         sendResponse({ requestId: message.requestId, success: false, errorCode: 'LIVE_EXTRACTION_FAILED', ...pageMetadata() });
@@ -67,9 +77,10 @@
       let timeout = null;
       let stabilityTimer = null;
       let transientObserver = null;
-      let lastFingerprint = '';
+      
       const handleFrameLoad = (event) => { if (event.target?.tagName === 'IFRAME') evaluate(); };
-      const finish = (result, readiness) => {
+      
+      const finish = (result, readiness, errorCode = null) => {
         if (settled) return;
         settled = true;
         clearTimeout(timeout);
@@ -78,51 +89,63 @@
         document.removeEventListener('load', handleFrameLoad, true);
         lastPublishedFingerprint = result.fingerprint;
         connectLiveObserver();
-        resolve({ ...result, readiness, observerStatus: 'connected' });
+        resolve({ ...result, readiness, errorCode, observerStatus: 'connected' });
       };
+
       const evaluate = () => {
+        if (settled) return;
         const result = currentExtraction(requestId, startedAt);
         const ready = result.selectorFound && result.rowCount > 0 && !result.loadingVisible;
-        if (!ready) {
-          lastFingerprint = result.fingerprint;
-          clearTimeout(stabilityTimer);
-          return;
-        }
-        if (result.fingerprint !== lastFingerprint) {
-          lastFingerprint = result.fingerprint;
-          clearTimeout(stabilityTimer);
-          stabilityTimer = setTimeout(evaluate, STABILITY_MS);
-          return;
-        }
-        finish(result, 'stable');
+        if (ready) finish(result, 'stable');
       };
+
       transientObserver = new MutationObserver(() => {
         clearTimeout(stabilityTimer);
-        stabilityTimer = setTimeout(evaluate, 80);
+        stabilityTimer = setTimeout(evaluate, STABILITY_MS);
       });
+
       for (const root of extractor.observationRoots(document)) {
         transientObserver.observe(root, { childList: true, subtree: true, characterData: true, attributes: true });
       }
-      timeout = setTimeout(() => finish(currentExtraction(requestId, startedAt), 'timeout'), EXTRACTION_TIMEOUT_MS);
+
+      timeout = setTimeout(() => {
+        if (settled) return;
+        const finalResult = currentExtraction(requestId, startedAt);
+        let errorCode = 'EXTRACTION_TIMEOUT';
+        if (!finalResult.selectorFound) errorCode = 'TABLE_NOT_FOUND';
+        else if (finalResult.loadingVisible) errorCode = 'TABLE_NOT_READY';
+        else if (finalResult.rowCount === 0) errorCode = 'NO_VALID_ROWS';
+        finish(finalResult, 'timeout', errorCode);
+      }, EXTRACTION_TIMEOUT_MS);
+
       document.addEventListener('load', handleFrameLoad, true);
-      evaluate();
+      stabilityTimer = setTimeout(evaluate, STABILITY_MS);
     });
   }
 
   async function publishIfChanged() {
     const startedAt = performance.now();
     const result = currentExtraction(`observer-${Date.now()}`, startedAt);
-    connectLiveObserver();
-    if (!result.selectorFound || !result.rowCount || result.loadingVisible || result.fingerprint === lastPublishedFingerprint) return;
+    
+    if (!result.selectorFound || !result.rowCount || result.loadingVisible || result.fingerprint === lastPublishedFingerprint) {
+      connectLiveObserver();
+      return;
+    }
+    
     try {
       const response = await chrome.runtime.sendMessage({
         type: 'SADA_TABLES_CHANGED',
         extraction: { ...result, success: true, readiness: 'stable', observerStatus: 'connected' },
       });
       if (response?.ok) lastPublishedFingerprint = result.fingerprint;
-      else if (response?.retry) observerTimer = setTimeout(() => void publishIfChanged(), OBSERVER_DEBOUNCE_MS);
+      else if (response?.retry) {
+        clearTimeout(observerTimer);
+        observerTimer = setTimeout(() => void publishIfChanged(), OBSERVER_DEBOUNCE_MS);
+      }
     } catch {
       // A later focus/manual refresh re-establishes the worker connection.
+    } finally {
+      connectLiveObserver();
     }
   }
 

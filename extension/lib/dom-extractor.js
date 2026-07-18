@@ -1,6 +1,11 @@
 (function installDomTableExtractor() {
   function textOf(cell) {
-    return cell.textContent.replace(/\s+/g, ' ').trim();
+    if (!cell) return '';
+    const clone = cell.cloneNode(true);
+    const hidden = clone.querySelectorAll('[style*="display:none"],[style*="display: none"],[style*="visibility:hidden"],[style*="visibility: hidden"],.hidden,.visually-hidden');
+    hidden.forEach((el) => el.remove());
+    clone.querySelectorAll('br, p, div, tr').forEach((el) => el.after('\n'));
+    return clone.textContent.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
   }
 
   function extractDocument(doc, framePath, result) {
@@ -69,21 +74,74 @@
     return String(value).replaceAll('ي', 'ی').replaceAll('ك', 'ک').replace(/\s+/g, ' ').trim();
   }
 
+  const headerAliases = {
+    title: ['نام درس', 'عنوان درس', 'درس'],
+    instructor: ['نام استاد', 'استاد'],
+    schedule: ['زمان کلاس', 'برنامه زمانی', 'برنامه زمانی کلاس', 'برنامه کلاس'],
+    exam: ['زمان امتحان', 'تاریخ امتحان', 'مکان امتحان'],
+    capacity: ['ظرفیت', 'ظرفیت باقیمانده', 'ظرفیت مانده'],
+    degree: ['مقطع'],
+    term: ['ترم'],
+    tuition: ['شهریه'],
+    gender: ['جنسیت مجاز', 'جنسیت'],
+    courseId: ['کد درس'],
+    units: ['تعداد واحد', 'واحد'],
+  };
+
+  function scoreRows(rows) {
+    if (!rows || rows.length === 0) return { score: 0, hasTitle: false, hasSchedule: false };
+    const headers = (rows[0] ?? []).map(normalizedHeader);
+    let score = 0;
+    let hasTitle = false;
+    let hasSchedule = false;
+
+    for (const header of headers) {
+      if (headerAliases.title.includes(header)) { score += 20; hasTitle = true; }
+      else if (headerAliases.schedule.includes(header)) { score += 20; hasSchedule = true; }
+      else if (headerAliases.instructor.includes(header)) score += 10;
+      else if (headerAliases.exam.includes(header)) score += 10;
+      else if (headerAliases.capacity.includes(header)) score += 10;
+      else if (headerAliases.degree.includes(header)) score += 10;
+      else if (headerAliases.term.includes(header)) score += 10;
+      else if (headerAliases.tuition.includes(header)) score += 10;
+      else if (headerAliases.gender.includes(header)) score += 10;
+      else if (headerAliases.courseId.includes(header)) score += 10;
+      else if (headerAliases.units.includes(header)) score += 10;
+    }
+
+    if (hasTitle && hasSchedule) score += 15;
+    if (headers.length >= 5 && headers.length <= 15) score += 5;
+    if (rows.length > 1) score += 5;
+
+    return { score, hasTitle, hasSchedule };
+  }
+
   function courseTableStatus(tables) {
-    const headerTable = tables.find(({ rows }) => {
-      const headers = (rows[0] ?? []).map(normalizedHeader);
-      return headers.includes('نام درس') && headers.includes('برنامه زمانی');
-    });
-    if (!headerTable) return { selectorFound: false, rowCount: 0 };
-    let rowCount = Math.max(0, headerTable.rows.length - 1);
+    let bestTable = null;
+    let maxScore = -1;
+
+    for (const table of tables) {
+      const scoreResult = scoreRows(table.rows);
+      if (scoreResult.score > maxScore) {
+        maxScore = scoreResult.score;
+        bestTable = table;
+      }
+    }
+
+    if (!bestTable || maxScore < 25) {
+      return { selectorFound: false, rowCount: 0, confidence: 0 };
+    }
+
+    let rowCount = Math.max(0, bestTable.rows.length - 1);
     if (!rowCount) {
-      const width = headerTable.rows[0].length;
+      const width = bestTable.rows[0].length;
       rowCount = tables
-        .filter((table) => table !== headerTable && table.framePath === headerTable.framePath)
+        .filter((table) => table !== bestTable && table.framePath === bestTable.framePath)
         .flatMap((table) => table.rows)
         .filter((row) => row.length === width).length;
     }
-    return { selectorFound: true, rowCount };
+
+    return { selectorFound: true, rowCount, confidence: maxScore };
   }
 
   globalThis.sadaDomExtractor = {

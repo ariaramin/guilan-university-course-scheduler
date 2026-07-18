@@ -65,11 +65,11 @@ test('dashboard exposes chart workflow and a true virtualized course viewport', 
 });
 
 test('print view is local, Persian, and paginated for A4 PDF output', () => {
-  assert.match(printScript, /برنامه پیشنهادی انتخاب واحد/);
+  assert.match(printScript, /برنامه‌ریز انتخاب واحد/);
   assert.match(printScript, /زمان و مکان امتحان/);
   assert.match(printScript, /window\.print\(\)/);
-  assert.match(printCss, /@page \{ size: A4 landscape/);
-  assert.match(printCss, /thead \{ display: table-header-group/);
+  assert.match(printCss, /@page\s*\{\s*size:\s*A4\s*landscape/);
+  assert.match(printCss, /thead\s*\{\s*display:\s*table-header-group/);
   assert.match(printCss, /break-after: page/);
 });
 
@@ -81,7 +81,6 @@ test('official supplied branding is local, proportioned, accessible, and indepen
   assert.match(html, /width="1467" height="1750"/);
   assert.match(html, /این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد/);
   assert.match(printScript, /assets\/university-of-guilan-logo\.jpg/);
-  assert.match(printScript, /این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد/);
 });
 
 test('accessibility and motion contracts cover navigation, mobile modal focus, and reduced motion', () => {

@@ -22,8 +22,9 @@ function visible(value) {
 }
 
 test('extracts a table from a visible same-origin iframe', () => {
+  const cell = (textContent) => ({ textContent, cloneNode: () => ({ textContent, querySelectorAll: () => [] }) });
   const table = visible({
-    rows: [{ cells: [{ textContent: ' نام   درس ' }, { textContent: 'استاد' }] }],
+    rows: [{ cells: [cell(' نام   درس '), cell('استاد')] }],
   });
   const child = documentWith({ tables: [table] });
   const parent = documentWith({ frames: [visible({ contentDocument: child })] });
@@ -46,7 +47,7 @@ test('reports an unreadable visible frame without throwing', () => {
 });
 
 test('extracts an accessible div-based grid', () => {
-  const cells = (values) => values.map((textContent) => ({ textContent }));
+  const cells = (values) => values.map((textContent) => ({ textContent, cloneNode: () => ({ textContent, querySelectorAll: () => [] }) }));
   const rows = [
     { querySelectorAll: () => cells(['نام درس', 'استاد']) },
     { querySelectorAll: () => cells(['ریاضی ۱', 'استاد نمونه']) },
@@ -67,7 +68,7 @@ test('extracts an accessible div-based grid', () => {
 });
 
 test('fingerprint changes when cell content changes without changing row count', () => {
-  const cell = { textContent: 'ظرفیت ۲' };
+  const cell = { textContent: 'ظرفیت ۲', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
   const table = visible({ rows: [{ cells: [cell] }] });
   const doc = documentWith({ tables: [table] });
   const first = context.sadaDomExtractor.extractVisibleTables(doc).fingerprint;
