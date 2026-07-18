@@ -32,10 +32,10 @@ try {
   await chrome.storage.session.remove(key);
   if (!model?.programs?.length) throw new TypeError('اطلاعات برنامه برای چاپ پیدا نشد.');
   document.title = model.programs.length === 1
-    ? `برنامه-پیشنهادی-${model.programs[0].number}-دانشگاه-گیلان`
-    : 'برنامه‌های-پیشنهادی-دانشگاه-گیلان';
+    ? `برنامه‌ریز-انتخاب-واحد-${model.programs[0].number}`
+    : 'برنامه‌ریز-انتخاب-واحد';
   for (const program of model.programs) {
-    const article = element('article', null, 'program');
+    const article1 = element('article', null, 'program page-1');
     const header = element('header', null, 'print-header');
     const identity = element('div', null, 'print-identity');
     const logo = document.createElement('img');
@@ -43,17 +43,19 @@ try {
     logo.alt = 'نشان دانشگاه گیلان';
     logo.width = 1467;
     logo.height = 1750;
-    identity.append(element('p', 'دانشگاه گیلان'), element('h1', 'برنامه پیشنهادی انتخاب واحد'));
-    header.append(logo, identity, element('strong', `برنامه پیشنهادی ${program.number}`));
-    article.append(header, element('p', `تاریخ تولید: ${model.generated} · مجموع واحد: ${program.units}`, 'print-meta'));
-    article.append(table(
+    identity.append(element('p', 'دانشگاه گیلان'), element('h1', 'برنامه‌ریز انتخاب واحد'));
+    header.append(logo, identity);
+    article1.append(header, element('p', `مجموع واحد: ${program.units}`, 'print-meta'));
+    article1.append(table(
       ['نام درس', 'نام استاد', 'زمان کلاس', 'زمان و مکان امتحان', 'مقطع', 'ترم', 'ظرفیت باقی‌مانده', 'شهریه'],
       program.courses.map((course) => [course.title, course.instructor, course.sessions, course.exam, course.degree, course.term, course.capacity, course.tuition]),
     ));
-    article.append(element('h2', 'برنامه هفتگی'));
-    article.append(table(['روز', 'کلاس‌ها'], program.week.map((day) => [day.day, day.entries.join('\n')])));
-    article.append(element('p', 'این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد.', 'print-notice'));
-    root.append(article);
+    root.append(article1);
+
+    const article2 = element('article', null, 'program page-2');
+    article2.append(element('h2', 'برنامه هفتگی'));
+    article2.append(table(['روز', 'کلاس‌ها'], program.week.map((day) => [day.day, day.entries.join('\n')])));
+    root.append(article2);
   }
   status.textContent = 'فایل برنامه با موفقیت آماده شد.';
   await Promise.all([
