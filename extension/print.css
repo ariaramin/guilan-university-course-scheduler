@@ -1,11 +1,11 @@
 @font-face{font-family:Vazirmatn;font-style:normal;font-display:swap;font-weight:400;src:url("fonts/vazirmatn-arabic-400-normal.woff2") format("woff2")}
 @font-face{font-family:Vazirmatn;font-style:normal;font-display:swap;font-weight:600;src:url("fonts/vazirmatn-arabic-600-normal.woff2") format("woff2")}
 
-:root { --ink: #0f172a; --muted: #526172; --border: #cbd5e1; --surface: #f1f5f9; --primary: #1e40af; --logo-width: 14mm; }
+:root { --ink: #18211E; --muted: #66736E; --border: #EEF2F1; --surface: #F8FAF9; --primary: #1F6B57; --logo-width: 14mm; }
 * { box-sizing: border-box; }
 body { margin: 0; color: var(--ink); background: #fff; font: 400 10pt/1.65 Vazirmatn, sans-serif; }
-#print-status { margin: 16px; padding: 10px 14px; color: var(--primary); background: #eff6ff; border: 1px solid #c7d5f3; border-radius: 6px; }
-#print-status[data-kind="error"] { color: #b42318; background: #fff0ee; }
+#print-status { margin: 16px; padding: 10px 14px; color: var(--primary); background: #DDF3EA; border: 1px solid var(--primary); border-radius: 6px; }
+#print-status[data-kind="error"] { color: #D85C5C; background: #fbebeb; border-color: #D85C5C; }
 .program { width: 100%; margin: 0 auto; padding: 12mm 10mm; break-after: page; }
 .program:last-child { break-after: auto; }
 .print-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--primary); }

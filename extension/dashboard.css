@@ -10,19 +10,35 @@
 :root {
   color-scheme: light;
   --font-family-base: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-size-xs: .75rem; --font-size-sm: .8125rem; --font-size-md: .9rem; --font-size-lg: 1.05rem; --font-size-xl: 1.35rem;
-  --font-weight-regular: 400; --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
-  --line-height-tight: 1.35; --line-height-base: 1.7;
-  --color-primary: #1e40af; --color-primary-hover: #1e3a8a; --color-primary-soft: #eff6ff;
-  --color-brand-header: #172554; --color-brand-header-border: #263b78; --color-brand-header-surface: #1e326b;
-  --color-brand-header-text: #e8edfb; --color-focus: #d97706;
-  --color-accent: #a85f00; --color-background: #f8fafc; --color-surface: #fff; --color-surface-muted: #f1f5f9;
-  --color-text: #0f172a; --color-text-secondary: #526172; --color-text-muted: #6b7787; --color-border: #dce3eb; --color-border-strong: #b9c5d2;
-  --color-success: #187052; --color-success-soft: #eaf7f1; --color-warning: #925b06; --color-warning-soft: #fff7df;
-  --color-error: #b42318; --color-error-soft: #fff0ee;
+  --font-size-xs: 0.8rem; --font-size-sm: 0.875rem; --font-size-md: 0.95rem; --font-size-lg: 1.1rem; --font-size-xl: 1.4rem;
+  --font-weight-regular: 400; --font-weight-medium: 600; --font-weight-semibold: 600; --font-weight-bold: 700;
+  --line-height-tight: 1.4; --line-height-base: 1.8;
+  --color-primary: #1F6B57;
+  --color-primary-hover: #123C32;
+  --color-primary-soft: #DDF3EA;
+  --color-brand-header: #123C32;
+  --color-brand-header-border: #1F6B57;
+  --color-brand-header-surface: #1F6B57;
+  --color-brand-header-text: #F8FAF9;
+  --color-focus: #1F6B57;
+  --color-accent: #1F6B57;
+  --color-background: #F8FAF9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #EEF2F1;
+  --color-text: #18211E;
+  --color-text-secondary: #66736E;
+  --color-text-muted: #66736E;
+  --color-border: #EEF2F1;
+  --color-border-strong: #66736E;
+  --color-success: #36A879;
+  --color-success-soft: #DDF3EA;
+  --color-warning: #E8B44C;
+  --color-warning-soft: #fdf8ed;
+  --color-error: #D85C5C;
+  --color-error-soft: #fbebeb;
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
   --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgb(15 23 42 / .05); --shadow-md: 0 12px 28px rgb(15 23 42 / .08);
+  --shadow-sm: 0 1px 2px rgb(24 33 30 / .05); --shadow-md: 0 12px 28px rgb(24 33 30 / .08);
   --icon-sm: 16px; --icon-md: 20px; --icon-lg: 24px; --container-width: 1500px;
   --control-height: 38px; --touch-target: 44px; --table-row-height: 72px; --table-min-width: 1180px; --brand-logo-height: 54px;
   --breakpoint-sm: 720px; --breakpoint-md: 1024px; --breakpoint-lg: 1280px;
@@ -33,7 +49,7 @@
 
 * { box-sizing: border-box; }
 html { max-width: 100%; overflow-x: clip; background: var(--color-background); }
-body { min-width: 320px; max-width: 100%; margin: 0; overflow-x: clip; color: var(--color-text); background: var(--color-background); font-family: var(--font-family-base); font-size: var(--font-size-md); line-height: var(--line-height-base); text-rendering: optimizeLegibility; }
+body { min-width: 320px; max-width: 100%; margin: 0; overflow-x: clip; color: var(--color-text); background: var(--color-background); font-family: var(--font-family-base); font-size: var(--font-size-md); line-height: var(--line-height-base); text-rendering: optimizeLegibility; direction: rtl; text-align: right; }
 button, input, select, textarea { font: inherit; }
 button, summary, label[for], .drop-zone { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
