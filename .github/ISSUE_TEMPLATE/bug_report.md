@@ -1,32 +1,33 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: گزارش خطا
+about: گزارش یک مشکل یا خطای فنی در افزونه
 title: "[BUG] "
 labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+⚠️ **توجه حریم خصوصی:** لطفاً از ارسال رمز عبور، شماره دانشجویی، کد ملی، Session Token یا اطلاعات شخصی خودداری کنید.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+### 🐛 شرح خطا
+توضیح شفاف و کوتاهی از خطای مشاهده‌شده را بنویسید.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+### 🔄 مراحل بازتولید
+مراحل ایجاد خطا را قدم به قدم وارد کنید:
+1. رفتن به صفحه '...'
+2. کلیک روی '...'
+3. مشاهده خطا
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+### 🎯 نتیجه مورد انتظار
+چه انتظاری داشتید اتفاق بیفتد؟
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+### 📊 نتیجه واقعی
+چه اتفاقی افتاد؟
 
-**Additional context**
-Add any other context about the problem here.
+### 💻 اطلاعات محیط اجرا
+- **سیستم‌عامل:** [مثلاً Windows 11 / macOS]
+- **مرورگر و نسخه:** [مثلاً Chrome 126]
+- **نسخه افزونه:** [مثلاً 1.0.0]
+
+### 🖼️ اسکرین‌شات یا لاگ تشخیصی
+در صورت امکان اسکرین‌شات یا متن لاگ غیرحساس را قرار دهید.

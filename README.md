@@ -43,48 +43,52 @@
 
 <h2 dir="rtl">🧩 قابلیت‌ها</h2>
 
-<table dir="rtl" width="100%" style="width: 100%;">
-  <thead>
+<table dir="rtl" align="center" width="1000">
+  <colgroup>
+    <col width="240" />
+    <col width="760" />
+  </colgroup>
+<thead>
     <tr>
-      <th dir="rtl" style="direction: rtl; text-align: right;">قابلیت</th>
-      <th dir="rtl" style="direction: rtl; text-align: right;">توضیح</th>
+      <th dir="rtl" align="right" width="240">قابلیت</th>
+      <th dir="rtl" align="right" width="760">توضیح</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>دریافت دروس</td>
-      <td>
+      <td dir="rtl" align="right" width="240">دریافت دروس</td>
+      <td dir="rtl" align="right" width="760">
         خواندن جدول فعلی و قابل‌مشاهده دروس از دامنه
         <code dir="ltr">sada.guilan.ac.ir</code>
       </td>
     </tr>
     <tr>
-      <td>تطبیق چارت</td>
-      <td>
+      <td dir="rtl" align="right" width="240">تطبیق چارت</td>
+      <td dir="rtl" align="right" width="760">
         پردازش فایل
         <code dir="ltr">DOCX</code>،
         تطبیق درس‌ها و بازبینی موارد مبهم
       </td>
     </tr>
     <tr>
-      <td>جست‌وجو و فیلتر</td>
-      <td>فیلتر بر اساس نام درس، استاد، روز، مقطع، ترم، واحد، جنسیت، ظرفیت و وضعیت چارت</td>
+      <td dir="rtl" align="right" width="240">جست‌وجو و فیلتر</td>
+      <td dir="rtl" align="right" width="760">فیلتر بر اساس نام درس، استاد، روز، مقطع، ترم، واحد، جنسیت، ظرفیت و وضعیت چارت</td>
     </tr>
     <tr>
-      <td>ساخت برنامه</td>
-      <td>پیشنهاد برنامه با جلوگیری از تداخل کلاس و امتحان</td>
+      <td dir="rtl" align="right" width="240">ساخت برنامه</td>
+      <td dir="rtl" align="right" width="760">پیشنهاد برنامه با جلوگیری از تداخل کلاس و امتحان</td>
     </tr>
     <tr>
-      <td>کنترل انتخاب‌ها</td>
-      <td>تعیین گروه‌های اجباری، ترجیحی یا حذف‌شده و ثبت درس‌های گذرانده‌شده</td>
+      <td dir="rtl" align="right" width="240">کنترل انتخاب‌ها</td>
+      <td dir="rtl" align="right" width="760">تعیین گروه‌های اجباری، ترجیحی یا حذف‌شده و ثبت درس‌های گذرانده‌شده</td>
     </tr>
     <tr>
-      <td>مقایسه برنامه‌ها</td>
-      <td>مقایسه هم‌زمان حداکثر دو برنامه پیشنهادی</td>
+      <td dir="rtl" align="right" width="240">مقایسه برنامه‌ها</td>
+      <td dir="rtl" align="right" width="760">مقایسه هم‌زمان حداکثر دو برنامه پیشنهادی</td>
     </tr>
     <tr>
-      <td>خروجی PDF</td>
-      <td>
+      <td dir="rtl" align="right" width="240">خروجی PDF</td>
+      <td dir="rtl" align="right" width="760">
         آماده‌سازی نسخه
         <span dir="ltr">A4</span>
         از طریق پنجره چاپ
@@ -94,8 +98,8 @@
       </td>
     </tr>
     <tr>
-      <td>پردازش محلی</td>
-      <td>
+      <td dir="rtl" align="right" width="240">پردازش محلی</td>
+      <td dir="rtl" align="right" width="760">
         پردازش داده‌ها و فایل چارت در مرورگر، بدون اتصال به
         <span dir="ltr">API</span>
         یا سرور خارجی

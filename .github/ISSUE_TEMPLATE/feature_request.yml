@@ -1,26 +1,26 @@
-name: Feature Request
-description: Suggest an idea for this project
+name: درخواست قابلیت جدید
+description: پیشنهاد یک ایده یا قابلیت تازه برای بهینه‌سازی افزونه
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: The Problem
-      description: مشکلی که این ویژگی حل می‌کند را شرح دهید.
+      label: مشکل فعلی (Problem Statement)
+      description: چالش یا مشکل فعلی که ناشی از عدم وجود این قابلیت است را بنویسید.
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: Proposed Solution
-      description: راه‌حل یا ویژگی پیشنهادی خود را شرح دهید.
+      label: قابلیت پیشنهادی (Proposed Solution)
+      description: تغییر پیشنهادی چیست و چگونه باید عمل کند؟
     validations:
       required: true
   - type: textarea
-    id: benefit
+    id: value
     attributes:
-      label: Expected Benefit
-      description: این ویژگی چه کمکی به کاربران می‌کند؟
+      label: ارزش برای کاربران (User Value)
+      description: این قابلیت چه ارزشی ایجاد می‌کند و چقدر فرآیند انتخاب واحد را آسان‌تر می‌سازد؟
     validations:
       required: true

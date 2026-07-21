@@ -1,27 +1,28 @@
-# Changelog
+# تاریخچه تغییرات (Changelog)
 
-All notable changes to this project will be documented in this file.
+تمام تغییرات مهم و نسخه‌های منتشرشده این پروژه در این فایل مستند می‌شوند.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+قالب این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) است و این پروژه از [Semantic Versioning](https://semver.org/spec/v2.0.0.html) پیروی می‌کند.
 
-## [1.0.0] - 2026-07-19
+---
 
-### Highlights
-- Initial open-source release of the Guilan Course Planner extension.
-- Chrome Extension (Manifest V3) running fully locally.
+## [1.0.0] - ۱۴۰۵/۰۴/۲۸ (2026-07-19)
 
-### Features
-- Extract offered courses safely via SADA.
-- Support reading `DOCX` files for chart integration.
-- Advanced filtering and virtualized grid view.
-- Automated non-conflicting schedule generation.
-- PDF printing support.
+### 🌟 برجسته‌ترین تغییرات
+* انتشار اولین نسخه متن‌باز افزونه **برنامه‌ریز انتخاب واحد گیلان**.
+* توسعه مبتنی بر Chrome Extension (**Manifest V3**) با پردازش تمام‌محلی.
 
-### Fixes
-- None (Initial release)
+### ✨ قابلیت‌ها
+* **استخراج دروس:** استخراج ایمن جدول دروس ارائه‌شده از سامانه SADA.
+* **تطبیق چارت درسی:** پشتیبانی از خواندن فایل‌های `DOCX` برای تطبیق دروس چارت.
+* **جست‌وجو و فیلتر پیشرفته:** فیلتر بر اساس نام درس، استاد، روز، مقطع، جنسیت و ظرفیت به همراه نمایش ردیف‌ها با تکنیک Virtualization.
+* **ساخت برنامه بدون تداخل:** ساخت خودکار برنامه‌های پیشنهادی بدون تداخل کلاس و امتحان.
+* **خروجی PDF:** امکان خروجی گرفتن و چاپ استاندارد A4 از برنامه‌های پیشنهادی.
 
-### Installation
-- Download the attached ZIP from the Release page.
-- Extract it.
-- Load the folder using Chrome's **Load unpacked** option.
+### 🐛 اصلاحات
+* انتشار نسخه اولیه (بدون اصلاحیه قبلی).
+
+### 📦 نحوه نصب
+1. فایل `ZIP` افزونه را از بخش Releases دانلود و از حالت فشرده خارج کنید.
+2. در مرورگر Chrome به آدرس `chrome://extensions` بروید.
+3. گزینه **Developer mode** را فعال کرده و با کلیک روی **Load unpacked** پوشه استخراج‌شده را انتخاب کنید.

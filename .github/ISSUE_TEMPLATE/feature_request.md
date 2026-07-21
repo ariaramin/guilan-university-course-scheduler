@@ -1,20 +1,20 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: درخواست قابلیت جدید
+about: پیشنهاد یک ایده یا قابلیت تازه برای توسعه افزونه
 title: "[FEATURE] "
 labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+### ❓ مشکل فعلی چیست؟
+توضیح دهید چه مشکلی وجود دارد یا چه فرآیندی دشوار است که این قابلیت جدید حل می‌کند.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+### 💡 تغییر یا قابلیت پیشنهادی چیست؟
+توضیح دهید چه تغییر یا امکاناتی مد نظر شماست و دوست دارید چگونه کار کند.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### 🚀 ارزش افزوده‌ برای کاربران چیست؟
+این قابلیت چه کمکی به دانشجویان یا کاربران افزونه می‌کند؟
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+### 🌐 راه‌حل‌های جایگزین
+اگر راه‌حل دیگری مد نظر داشته‌اید، مشخص کنید.
