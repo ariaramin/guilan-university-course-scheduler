@@ -25,11 +25,19 @@ jobs:
         run: npm ci
 
       - name: Run Tests
+        env:
+          TZ: UTC
         run: npm test
 
-      - name: Verify Extension Output
+      - name: Verify Extension Output and Version
         run: |
           if [ ! -f "extension/manifest.json" ]; then
             echo "Error: extension/manifest.json not found."
+            exit 1
+          fi
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          MANIFEST_VERSION=$(node -p "require('./extension/manifest.json').version")
+          if [ "$PACKAGE_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "Error: package.json version ($PACKAGE_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
             exit 1
           fi

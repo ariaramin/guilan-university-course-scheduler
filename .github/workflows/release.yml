@@ -24,18 +24,27 @@ jobs:
         id: validate_version
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
           MANIFEST_VERSION=$(node -p "require('./extension/manifest.json').version")
           
           if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
             echo "Error: Tag version (v$TAG_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
             exit 1
           fi
+          
+          if [ "$PACKAGE_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "Error: package.json version ($PACKAGE_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
+            exit 1
+          fi
+          
           echo "VERSION=$MANIFEST_VERSION" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Run Tests
+        env:
+          TZ: UTC
         run: npm test
 
       - name: Build Extension Artifact
