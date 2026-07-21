@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "برنامه‌ریز انتخاب واحد گیلان",
+  "name": "برنامه‌ریز انتخاب واحد دانشگاه گیلان",
   "version": "1.0.0",
   "description": "تحلیل محلی دروس و ساخت برنامه‌های بدون تداخل",
   "permissions": ["storage", "scripting"],
