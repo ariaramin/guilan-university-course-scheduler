@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-test:
@@ -35,9 +40,21 @@ jobs:
             echo "Error: extension/manifest.json not found."
             exit 1
           fi
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          MANIFEST_VERSION=$(node -p "require('./extension/manifest.json').version")
+
+          for asset in "background.js" "content.js" "dashboard.html" "assets/icon-16.png" "assets/icon-32.png" "assets/icon-48.png" "assets/icon-128.png"; do
+            if [ ! -f "extension/$asset" ]; then
+              echo "Error: extension/$asset not found."
+              exit 1
+            fi
+          done
+
+          PACKAGE_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('./package.json', 'utf8')).version")
+          MANIFEST_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('./extension/manifest.json', 'utf8')).version")
+
           if [ "$PACKAGE_VERSION" != "$MANIFEST_VERSION" ]; then
             echo "Error: package.json version ($PACKAGE_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
             exit 1
           fi
+
+          echo "Verified manifest and package version: $MANIFEST_VERSION"
+

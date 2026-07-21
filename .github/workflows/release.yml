@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
@@ -24,19 +29,19 @@ jobs:
         id: validate_version
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          MANIFEST_VERSION=$(node -p "require('./extension/manifest.json').version")
-          
-          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+          PACKAGE_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('./package.json', 'utf8')).version")
+          MANIFEST_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('./extension/manifest.json', 'utf8')).version")
+
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ] && [ "${GITHUB_REF}" != "refs/heads/main" ]; then
             echo "Error: Tag version (v$TAG_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
             exit 1
           fi
-          
+
           if [ "$PACKAGE_VERSION" != "$MANIFEST_VERSION" ]; then
             echo "Error: package.json version ($PACKAGE_VERSION) does not match manifest.json version ($MANIFEST_VERSION)"
             exit 1
           fi
-          
+
           echo "VERSION=$MANIFEST_VERSION" >> $GITHUB_ENV
 
       - name: Install Dependencies
