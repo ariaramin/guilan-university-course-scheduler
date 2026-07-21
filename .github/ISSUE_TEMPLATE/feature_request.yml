@@ -1,0 +1,26 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The Problem
+      description: مشکلی که این ویژگی حل می‌کند را شرح دهید.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: راه‌حل یا ویژگی پیشنهادی خود را شرح دهید.
+    validations:
+      required: true
+  - type: textarea
+    id: benefit
+    attributes:
+      label: Expected Benefit
+      description: این ویژگی چه کمکی به کاربران می‌کند؟
+    validations:
+      required: true

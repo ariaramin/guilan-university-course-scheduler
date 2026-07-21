@@ -1,0 +1,56 @@
+name: Bug Report
+description: Create a report to help us improve the extension
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **توجه:** لطفاً از ارسال رمز عبور، اطلاعات هویتی شخصی (مانند شماره دانشجویی)، نشست‌ها (Session Tokens) و اطلاعات خصوصی خودداری کنید.
+  - type: input
+    id: version
+    attributes:
+      label: Extension Version
+      description: نسخه افزونه (مثلاً 1.0.0)
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser Version
+      description: مرورگر و نسخه آن (مثلاً Chrome 120)
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: سیستم‌عامل (مثلاً Windows 11)
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: مراحل ایجاد خطا را قدم به قدم بنویسید.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: چه انتظاری داشتید رخ دهد؟
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: چه اتفاقی رخ داد؟
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Logs
+      description: در صورت نیاز اسکرین‌شات یا لاگ‌های تشخیصی (بدون اطلاعات حساس) را اینجا قرار دهید.
