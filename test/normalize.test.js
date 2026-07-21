@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { englishDigits, minutes, normalizeGroup } from '../extension/lib/normalize.js';
+import { englishDigits, normalizeGroup, parseTimeToMinutes } from '../extension/lib/normalize.js';
 
 test('converts Persian and Arabic digits', () => {
   assert.equal(englishDigits('۱۲۳٤٥٦'), '123456');
 });
 
 test('normalizes Persian time and rejects impossible time', () => {
-  assert.equal(minutes('۰۸:۳۰'), 510);
-  assert.throws(() => minutes('25:00'), RangeError);
+  assert.equal(parseTimeToMinutes('۰۸:۳۰'), 510);
+  assert.throws(() => parseTimeToMinutes('25:00'), RangeError);
 });
 
 test('normalizes multi-session groups and unknown exam time', () => {

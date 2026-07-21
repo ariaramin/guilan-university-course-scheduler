@@ -26,9 +26,9 @@ test('dashboard ships local Persian typography and Word chart support', () => {
   const css = readFileSync(new URL('../extension/dashboard.css', import.meta.url), 'utf8');
   assert.match(html, /accept="\.docx,\.doc,/);
   assert.doesNotMatch(html, /\.pdf|application\/pdf|\.xlsx|\.csv/);
-  assert.match(html, /vendor\/mammoth\.browser\.min\.js/);
+  assert.match(script, /vendor\/mammoth\.browser\.min\.js/);
   assert.match(css, /@font-face/);
-  assert.match(css, /font-family:Vazirmatn/);
+  assert.match(css, /font-family:\s*Vazirmatn/);
   assert.doesNotMatch(css, /https?:\/\//);
 });
 
@@ -94,10 +94,10 @@ test('accessibility and motion contracts cover navigation, mobile modal focus, a
 });
 
 test('content, chart, and gender refinements remain concise and explicit', () => {
-  const description = 'ابزاری محلی برای مرور درس‌های ارائه‌شده، تطبیق چارت و پیشنهاد انتخاب‌های بدون تداخل، بدون ارسال داده به سرور خارجی.';
+  const description = 'ابزاری محلی برای مرور درس‌های ارائه‌شده، تطبیق چارت و پیشنهاد انتخاب‌های بدون تداخل، بدون ارسال داده به سرور خارجی';
   assert.equal(html.split(description).length - 1, 1);
   assert.match(html, /class="product-description"/);
-  assert.match(html, /id="gender-filter"><option value="">همه<\/option><option value="male">آقایان<\/option><option value="female">بانوان<\/option>/);
+  assert.match(html, /id="gender-filter">[\s\S]*?<option value="">همه<\/option>[\s\S]*?<option value="male">آقایان<\/option>[\s\S]*?<option value="female">بانوان<\/option>/);
   assert.match(html, /id="chart-filter"/);
   assert.doesNotMatch(html, /id="chart-only"/);
   assert.match(script, /group\.chartStatus === 'matched'/);

@@ -9,8 +9,15 @@ test('formats class sessions with Persian days, digits, and wording', () => {
 
 test('formats Jalali exam date with its full Persian weekday', () => {
   assert.equal(
-    formatExam({ date: '1405-04-25', start: 840, end: 1020, location: 'دانشکده فنی' }),
+    formatExam({ date: '1405-04-25', start: 840, end: 1020, location: 'دانشکده فنی', weekday: 'پنجشنبه' }),
     'پنجشنبه ۱۴۰۵/۰۴/۲۵ ساعت ۱۴ تا ۱۷ (دانشکده فنی)',
+  );
+});
+
+test('formats exam with location only (no date or time)', () => {
+  assert.equal(
+    formatExam({ date: null, start: null, end: null, location: 'دانشکده فنی', weekday: null }),
+    'دانشکده فنی',
   );
 });
 

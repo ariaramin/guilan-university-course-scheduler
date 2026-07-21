@@ -29,7 +29,7 @@ test('parses the confirmed SADA offered-course columns', () => {
       detectedPhrases: [], finalEligibility: 'unspecified',
     },
     sessions: [{ day: 4, start: 840, end: 1200, week: 'all' }],
-    exam: { date: '1405-05-10', calendar: 'jalali', start: 540, end: 660, location: null },
+    exam: { date: '1405-05-10', calendar: 'jalali', start: 540, end: 660, location: null, weekday: null, raw: '1405/05/10 09:00 - 11:00' },
     tuition: null,
     sourceWarnings: [],
   });

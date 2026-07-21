@@ -26,6 +26,7 @@ test('live content extraction waits through row changes and publishes a later ob
     performance, setTimeout, clearTimeout, addEventListener() {},
     sadaDomExtractor: {
       extractVisibleTables: () => ({ ...current }),
+      checkTableReadiness: () => ({ selectorFound: current.selectorFound, rowCount: current.rowCount, loadingVisible: false }),
       hasVisibleLoadingIndicator: () => false,
       observationRoots: () => [{}],
     },

@@ -68,12 +68,17 @@ test('extracts an accessible div-based grid', () => {
 });
 
 test('fingerprint changes when cell content changes without changing row count', () => {
-  const cell = { textContent: 'ظرفیت ۲', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
-  const table = visible({ rows: [{ cells: [cell] }] });
+  const cell1 = { textContent: 'نام درس', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
+  const cell2 = { textContent: 'استاد', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
+  const cell3 = { textContent: 'گروه', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
+  const cell4 = { textContent: 'ظرفیت ۲', cloneNode: function() { return { textContent: this.textContent, querySelectorAll: () => [] }; } };
+  const table = visible({ rows: [{ cells: [cell1, cell2, cell3, cell4] }] });
   const doc = documentWith({ tables: [table] });
-  const first = context.sadaDomExtractor.extractVisibleTables(doc).fingerprint;
-  cell.textContent = 'ظرفیت ۱';
-  assert.notEqual(first, context.sadaDomExtractor.extractVisibleTables(doc).fingerprint);
+  const result1 = context.sadaDomExtractor.extractVisibleTables(doc);
+  const first = result1.fingerprint;
+  cell4.textContent = 'ظرفیت ۱';
+  const result2 = context.sadaDomExtractor.extractVisibleTables(doc);
+  assert.notEqual(result2.fingerprint, first);
 });
 
 test('chooses the smallest stable table container for mutation observation', () => {
