@@ -1,99 +1,504 @@
 <p align="center">
-  <img src="./thumbnail.png" alt="نمای افزونه انتخاب واحد" />
+  <img src="./thumbnail.png" alt="نمای افزونه برنامه‌ریز انتخاب واحد دانشگاه گیلان" />
 </p>
 
-# برنامه‌ریز انتخاب واحد گیلان
+<h1 align="center" dir="rtl">برنامه‌ریز انتخاب واحد گیلان</h1>
 
-ابزاری محلی برای مرور درس‌های ارائه‌شده، تطبیق چارت و پیشنهاد برنامه‌های بدون تداخل، بدون ارسال داده به سرور خارجی.
+<p align="center" dir="rtl">
+  افزونه‌ای محلی برای خواندن دروس ارائه‌شده در سامانه
+  <span dir="ltr">SADA</span>،
+  تطبیق چارت درسی و ساخت برنامه‌های بدون تداخل کلاسی و امتحانی.
+</p>
 
-[![CI](https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml/badge.svg)](https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/ariaramin/guilan-university-course-scheduler/releases)
-[![Manifest](https://img.shields.io/badge/Manifest-V3-success.svg)](https://developer.chrome.com/docs/extensions/mv3/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<p align="center" dir="ltr">
+  <a href="https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml">
+    <img src="https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml/badge.svg" alt="CI status" />
+  </a>
+  <a href="./extension/manifest.json">
+    <img src="https://img.shields.io/badge/version-1.0.0-0969da" alt="Version 1.0.0" />
+  </a>
+  <a href="./extension/manifest.json">
+    <img src="https://img.shields.io/badge/Manifest-V3-2ea44f" alt="Chrome Manifest V3" />
+  </a>
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-f2c744" alt="MIT License" />
+  </a>
+</p>
 
-## ✨ معرفی
+<h2 dir="rtl">✨ معرفی</h2>
 
-افزونه **برنامه‌ریز انتخاب واحد گیلان** ابزاری ساده و کاربردی است که فرایند پیچیده و زمان‌بر بررسی دروس، تطبیق با چارت درسی و چیدمان جدول زمان‌بندی را تسهیل می‌کند. این ابزار به صورت کاملاً محلی در مرورگر کاربر اجرا شده و از ارسال داده‌ها به سرورهای ثالث جلوگیری می‌نماید.
+<p dir="rtl">
+  <strong>برنامه‌ریز انتخاب واحد گیلان</strong>
+  یک افزونه
+  <span dir="ltr">Chrome</span>
+  برای ساده‌تر کردن بررسی دروس ارائه‌شده در سامانه
+  <span dir="ltr">SADA</span>
+  است. افزونه جدول فعلی دروس را از صفحه باز سامانه می‌خواند، امکان تطبیق آن با فایل چارت درسی را فراهم می‌کند و بر اساس محدودیت‌ها و ترجیح‌های کاربر، برنامه‌های پیشنهادی می‌سازد.
+</p>
 
-## 🧩 قابلیت‌های اصلی
+<blockquote dir="rtl">
+  <strong>مهم:</strong>
+  این پروژه مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد.
+</blockquote>
 
-| قابلیت | توضیح |
-| --- | --- |
-| دریافت دروس | خواندن اطلاعات فعلی جدول دروس سامانه SADA |
-| تطبیق چارت | تشخیص دروس موجود در فایل چارت (DOCX) |
-| ساخت برنامه | پیشنهاد برنامه‌های بدون تداخل کلاسی و امتحانی |
-| خروجی PDF | دریافت برنامه پیشنهادی در قالب مناسب A4 |
-| پردازش محلی | عدم ارسال اطلاعات کاربر به سرور خارجی |
+<h2 dir="rtl">🧩 قابلیت‌ها</h2>
 
-## 🚀 شروع سریع
+<table dir="rtl" width="100%" style="width: 100%;">
+  <thead>
+    <tr>
+      <th dir="rtl" style="direction: rtl; text-align: right;">قابلیت</th>
+      <th dir="rtl" style="direction: rtl; text-align: right;">توضیح</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>دریافت دروس</td>
+      <td>
+        خواندن جدول فعلی و قابل‌مشاهده دروس از دامنه
+        <code dir="ltr">sada.guilan.ac.ir</code>
+      </td>
+    </tr>
+    <tr>
+      <td>تطبیق چارت</td>
+      <td>
+        پردازش فایل
+        <code dir="ltr">DOCX</code>،
+        تطبیق درس‌ها و بازبینی موارد مبهم
+      </td>
+    </tr>
+    <tr>
+      <td>جست‌وجو و فیلتر</td>
+      <td>فیلتر بر اساس نام درس، استاد، روز، مقطع، ترم، واحد، جنسیت، ظرفیت و وضعیت چارت</td>
+    </tr>
+    <tr>
+      <td>ساخت برنامه</td>
+      <td>پیشنهاد برنامه با جلوگیری از تداخل کلاس و امتحان</td>
+    </tr>
+    <tr>
+      <td>کنترل انتخاب‌ها</td>
+      <td>تعیین گروه‌های اجباری، ترجیحی یا حذف‌شده و ثبت درس‌های گذرانده‌شده</td>
+    </tr>
+    <tr>
+      <td>مقایسه برنامه‌ها</td>
+      <td>مقایسه هم‌زمان حداکثر دو برنامه پیشنهادی</td>
+    </tr>
+    <tr>
+      <td>خروجی PDF</td>
+      <td>
+        آماده‌سازی نسخه
+        <span dir="ltr">A4</span>
+        از طریق پنجره چاپ
+        <span dir="ltr">Chrome</span>
+        و گزینه
+        <strong dir="ltr">Save as PDF</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>پردازش محلی</td>
+      <td>
+        پردازش داده‌ها و فایل چارت در مرورگر، بدون اتصال به
+        <span dir="ltr">API</span>
+        یا سرور خارجی
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-برای نصب و استفاده سریع از افزونه، کافی است آخرین نسخه انتشار یافته را دریافت کرده و آن را به عنوان افزونه بارگذاری‌نشده (Unpacked) در مرورگر Chrome فعال کنید.
+<h2 dir="rtl">🚀 شروع سریع</h2>
 
-## 📦 نصب افزونه
+<p dir="rtl">
+  برای استفاده از نسخه فعلی، مخزن را دریافت کنید و پوشه
+  <code dir="ltr">extension</code>
+  را مستقیماً در
+  <span dir="ltr">Chrome</span>
+  بارگذاری کنید. پروژه مرحله
+  <span dir="ltr">build</span>
+  جداگانه‌ای ندارد.
+</p>
 
-۱. دریافت نسخه انتشار یافته (ZIP) از بخش Releases یا کلون کردن مخزن.
-۲. Extract کردن فایل دانلود شده در یک پوشه محلی.
-۳. باز کردن مرورگر Chrome و ورود به آدرس `chrome://extensions`.
-۴. فعال‌سازی گزینه **Developer mode** در گوشه بالا سمت راست.
-۵. کلیک روی دکمه **Load unpacked**.
-۶. انتخاب پوشه `extension` از مسیر پروژه.
-۷. ورود به سامانه SADA دانشگاه گیلان و اجرای افزونه.
+<h3 dir="rtl">نصب از سورس</h3>
 
-## 🧭 نحوه استفاده
+<ol dir="rtl">
+  <li>
+    مخزن را
+    <span dir="ltr">Clone</span>
+    کنید:
+  </li>
+</ol>
 
-۱. باز کردن صفحه **گروه‌های درسی ارائه شده** در سامانه SADA.
-۲. کلیک روی آیکون افزونه در نوار مرورگر برای خواندن جدول دروس.
-۳. بارگذاری فایل چارت درسی (`.docx`) در صورت تمایل.
-۴. تنظیم فیلترهای روز، ظرفیت، و جنسیت.
-۵. مشاهده برنامه‌های پیشنهادی بدون تداخل.
-۶. دریافت نسخه چاپی یا خروجی PDF از برنامه انتخابی.
+<pre dir="ltr"><code class="language-bash">git clone https://github.com/ariaramin/guilan-university-course-scheduler.git
+cd guilan-university-course-scheduler</code></pre>
 
-## 🛠️ توسعه و تست
+<p dir="rtl">
+  یا از منوی
+  <strong dir="ltr">Code → Download ZIP</strong>
+  در
+  <span dir="ltr">GitHub</span>،
+  سورس پروژه را دانلود و استخراج کنید.
+</p>
 
-برای آماده‌سازی وابستگی‌ها و اجرای تست‌های محلی پروژه:
+<ol dir="rtl" start="2">
+  <li>
+    در
+    <span dir="ltr">Chrome</span>
+    آدرس زیر را باز کنید:
+  </li>
+</ol>
 
-```bash
-# نصب وابستگی‌ها
-npm install
+<pre dir="ltr"><code>chrome://extensions</code></pre>
 
-# اجرای تست‌های واحد
+<ol dir="rtl" start="3">
+  <li>
+    گزینه
+    <strong dir="ltr">Developer mode</strong>
+    را فعال کنید.
+  </li>
+  <li>
+    روی
+    <strong dir="ltr">Load unpacked</strong>
+    کلیک کنید.
+  </li>
+  <li>پوشه زیر را انتخاب کنید:</li>
+</ol>
+
+<pre dir="ltr"><code>extension/</code></pre>
+
+<ol dir="rtl" start="6">
+  <li>
+    صفحه فهرست دروس در سامانه
+    <span dir="ltr">SADA</span>
+    را باز یا بازخوانی کنید و سپس روی آیکن افزونه کلیک کنید.
+  </li>
+</ol>
+
+<blockquote dir="rtl">
+  <strong>نکته:</strong>
+  در حال حاضر
+  <span dir="ltr">Release</span>
+  عمومی در مخزن منتشر نشده است؛ بنابراین نصب از سورس روش قابل‌تأیید پروژه است.
+</blockquote>
+
+<h2 dir="rtl">🧭 راهنمای استفاده</h2>
+
+<ol dir="rtl">
+  <li>
+    وارد سامانه
+    <span dir="ltr">SADA</span>
+    شوید و صفحه‌ای را باز کنید که جدول دروس ارائه‌شده در آن نمایش داده می‌شود.
+  </li>
+  <li>روی آیکن افزونه کلیک کنید تا صفحه برنامه‌ریز باز شود.</li>
+  <li>وضعیت دریافت داده را بررسی کنید؛ افزونه فقط جدول فعلی و قابل‌مشاهده صفحه را می‌خواند.</li>
+  <li>
+    در صورت نیاز، فایل چارت درسی با فرمت
+    <code dir="ltr">DOCX</code>
+    را بارگذاری و موارد شناسایی‌شده را بازبینی کنید.
+  </li>
+  <li>واحد هدف، تعداد درس و فیلترهای موردنظر را تنظیم کنید.</li>
+  <li>گروه‌های اجباری، ترجیحی یا حذف‌شده و درس‌های گذرانده‌شده را مشخص کنید.</li>
+  <li>برنامه‌های پیشنهادی را بررسی یا حداکثر دو مورد را مقایسه کنید.</li>
+  <li>
+    برای دریافت
+    <span dir="ltr">PDF</span>،
+    روی <strong>دانلود PDF</strong> بزنید و در پنجره چاپ
+    <span dir="ltr">Chrome</span>
+    گزینه
+    <strong dir="ltr">Save as PDF</strong>
+    را انتخاب کنید.
+  </li>
+</ol>
+
+<h3 dir="rtl">محدودیت فایل چارت</h3>
+
+<ul dir="rtl">
+  <li>
+    فرمت پیشنهادی و قابل‌پردازش:
+    <code dir="ltr">DOCX</code>
+  </li>
+  <li>
+    حداکثر حجم:
+    <code dir="ltr">20 MB</code>
+  </li>
+  <li>
+    فایل قدیمی
+    <code dir="ltr">DOC</code>
+    باید ابتدا به
+    <code dir="ltr">DOCX</code>
+    تبدیل شود.
+  </li>
+  <li>
+    فایل‌های
+    <code dir="ltr">PDF</code>،
+    <span dir="ltr">Spreadsheet</span>
+    و متن آزاد به‌عنوان ورودی چارت پشتیبانی نمی‌شوند.
+  </li>
+</ul>
+
+<h2 dir="rtl">🛠️ توسعه</h2>
+
+<p dir="rtl">
+  پروژه با
+  <span dir="ltr">JavaScript</span>
+  ماژولار و
+  <span dir="ltr">Chrome Extension Manifest V3 APIs</span>
+  پیاده‌سازی شده است. وابستگی‌ها با
+  <code dir="ltr">npm</code>
+  مدیریت می‌شوند، اما فایل‌های پوشه
+  <code dir="ltr">extension</code>
+  بدون
+  <span dir="ltr">build</span>
+  جداگانه قابل‌بارگذاری هستند.
+</p>
+
+<h3 dir="rtl">پیش‌نیازها</h3>
+
+<ul dir="rtl">
+  <li>
+    <span dir="ltr">Node.js 20</span>
+    برای هماهنگی با
+    <span dir="ltr">CI</span>
+  </li>
+  <li><code dir="ltr">npm</code></li>
+  <li>
+    <span dir="ltr">Google Chrome</span>
+    یا مرورگری سازگار با بارگذاری افزونه‌های
+    <span dir="ltr">Manifest V3</span>
+  </li>
+</ul>
+
+<h3 dir="rtl">نصب وابستگی‌ها</h3>
+
+<p dir="rtl">برای توسعه محلی:</p>
+
+<pre dir="ltr"><code class="language-bash">npm install</code></pre>
+
+<p dir="rtl">
+  برای نصب قابل‌تکرار در
+  <span dir="ltr">CI</span>
+  یا محیط تمیز:
+</p>
+
+<pre dir="ltr"><code class="language-bash">npm ci</code></pre>
+
+<h3 dir="rtl">اجرای تست‌ها</h3>
+
+<pre dir="ltr"><code class="language-bash">npm test</code></pre>
+
+<p dir="rtl">
+  این فرمان تست‌های پروژه را با
+  <span dir="ltr">Node.js Test Runner</span>
+  اجرا می‌کند.
+</p>
+
+<blockquote dir="rtl">
+  <strong>نکته:</strong>
+  در
+  <code dir="ltr">package.json</code>
+  فقط اسکریپت
+  <code dir="ltr">test</code>
+  تعریف شده است. پروژه در حال حاضر اسکریپت جداگانه‌ای برای
+  <code dir="ltr">dev</code>،
+  <code dir="ltr">build</code>،
+  <code dir="ltr">lint</code>
+  یا
+  <code dir="ltr">typecheck</code>
+  ندارد.
+</blockquote>
+
+<h3 dir="rtl">بررسی دستی افزونه</h3>
+
+<ol dir="rtl">
+  <li>
+    صفحه
+    <code dir="ltr">chrome://extensions</code>
+    را باز کنید.
+  </li>
+  <li>
+    روی دکمه
+    <strong dir="ltr">Reload</strong>
+    کارت افزونه کلیک کنید.
+  </li>
+  <li>
+    صفحه
+    <span dir="ltr">SADA</span>
+    را بازخوانی کنید.
+  </li>
+  <li>
+    جریان دریافت دروس، فیلترها، بارگذاری چارت، پیشنهاد برنامه و چاپ
+    <span dir="ltr">PDF</span>
+    را بررسی کنید.
+  </li>
+</ol>
+
+<h2 dir="rtl">🧪 CI و انتشار</h2>
+
+<p dir="rtl">
+  <span dir="ltr">Workflow</span>
+  مربوط به
+  <span dir="ltr">CI</span>
+  در
+  <span dir="ltr">Push</span>
+  و
+  <span dir="ltr">Pull Request</span>های
+  شاخه
+  <code dir="ltr">main</code>
+  اجرا می‌شود و مراحل زیر را انجام می‌دهد:
+</p>
+
+<pre dir="ltr"><code>npm ci
 npm test
-```
+Verify extension/manifest.json</code></pre>
 
-فایل‌های پروژه به صورت native و بدون نیاز به بیلد پیچیده طراحی شده‌اند و سورس‌کد موجود در پوشه `extension` مستقیماً قابل بارگذاری است.
+<p dir="rtl">
+  <span dir="ltr">Workflow</span>
+  انتشار نیز برای تگ‌های
+  <code dir="ltr">v*</code>
+  آماده شده است. این
+  <span dir="ltr">Workflow</span>
+  نسخه تگ را با نسخه
+  <code dir="ltr">extension/manifest.json</code>
+  تطبیق می‌دهد، تست‌ها را اجرا می‌کند و محتوای پوشه
+  <code dir="ltr">extension</code>
+  را به‌صورت
+  <span dir="ltr">ZIP</span>
+  به
+  <span dir="ltr">GitHub Release</span>
+  اضافه می‌کند.
+</p>
 
-## 🔐 حریم خصوصی
+<h2 dir="rtl">🔐 حریم خصوصی و دسترسی‌ها</h2>
 
-* تمامی اطلاعات جدول دروس و چارت درسی صرفاً درون مرورگر کاربر پردازش می‌شوند.
-* هیچ‌گونه داده شخصی، Cookie، رمز عبور یا Session Token ذخیره یا منتقل نمی‌شود.
-* ثبت یا اخذ دروس به صورت خودکار انجام نمی‌گیرد و افزونه صرفاً نقش دستیار برنامه‌ریزی را دارد.
+<ul dir="rtl">
+  <li>
+    مجوزهای افزونه به
+    <code dir="ltr">storage</code>
+    و
+    <code dir="ltr">scripting</code>
+    محدود شده‌اند.
+  </li>
+  <li>
+    دسترسی میزبان فقط برای
+    <code dir="ltr">https://sada.guilan.ac.ir/*</code>
+    تعریف شده است.
+  </li>
+  <li>
+    افزونه به مجوز عمومی
+    <code dir="ltr">tabs</code>،
+    <span dir="ltr">Cookie</span>ها
+    یا
+    <span dir="ltr">Session Token</span>ها
+    دسترسی ندارد.
+  </li>
+  <li>
+    جدول دروس، ترجیح‌ها و داده ساخت‌یافته چارت در
+    <code dir="ltr">chrome.storage.local</code>
+    نگه‌داری می‌شوند.
+  </li>
+  <li>فایل خام چارت ذخیره یا به سرور خارجی ارسال نمی‌شود.</li>
+  <li>افزونه انتخاب واحد را ثبت نمی‌کند و فقط یک ابزار برنامه‌ریزی است.</li>
+</ul>
 
-> [!IMPORTANT]
-> این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد.
+<blockquote dir="rtl">
+  <strong>هشدار:</strong>
+  رمز عبور،
+  <span dir="ltr">Cookie</span>،
+  <span dir="ltr">Session Token</span>،
+  شماره دانشجویی یا فایل‌های آموزشی خصوصی را در
+  <span dir="ltr">Issue</span>ها
+  و
+  <span dir="ltr">Pull Request</span>ها
+  منتشر نکنید.
+</blockquote>
 
-## 🤝 مشارکت
+<h2 dir="rtl">🤝 مشارکت</h2>
 
-برای مشارکت در توسعه پروژه:
+<p dir="rtl">
+  راهنمای کامل مشارکت در
+  <a href="./CONTRIBUTING.md"><code dir="ltr">CONTRIBUTING.md</code></a>
+  قرار دارد. روند پیشنهادی:
+</p>
 
-۱. پروژه را Fork کنید.
-۲. یک شاخه (Branch) جدید ایجاد کنید.
-۳. تغییرات خود را اعمال و با `npm test` اعتبارسنجی نمایید.
-۴. Commitهای شفاف و منظم ثبت کرده و Pull Request ارسال کنید.
+<ol dir="rtl">
+  <li>
+    مخزن را
+    <span dir="ltr">Fork</span>
+    کنید.
+  </li>
+  <li>
+    یک
+    <span dir="ltr">Branch</span>
+    با نام روشن بسازید.
+  </li>
+  <li>تغییرات را کوچک و متمرکز نگه دارید.</li>
+  <li>
+    <code dir="ltr">npm test</code>
+    را اجرا و افزونه را با
+    <strong dir="ltr">Load unpacked</strong>
+    بررسی کنید.
+  </li>
+  <li>
+    <span dir="ltr">Pull Request</span>
+    را همراه با توضیح تغییر و نتیجه تست‌ها ارسال کنید.
+  </li>
+</ol>
 
-توضیحات بیشتر در فایل [CONTRIBUTING.md](CONTRIBUTING.md) آورده شده است.
+<h2 dir="rtl">🐞 گزارش خطا</h2>
 
-## 🐞 گزارش خطا
+<p dir="rtl">
+  برای گزارش مشکل، یک
+  <a href="https://github.com/ariaramin/guilan-university-course-scheduler/issues/new/choose">
+    <span dir="ltr">Issue</span> جدید
+  </a>
+  ایجاد کنید و این موارد را بنویسید:
+</p>
 
-در صورت مشاهده هرگونه مشکل، لطفاً یک Issue جدید با مشخصات زیر ثبت کنید:
+<ul dir="rtl">
+  <li>
+    نسخه افزونه،
+    <span dir="ltr">Chrome</span>
+    و سیستم‌عامل
+  </li>
+  <li>مراحل دقیق بازتولید</li>
+  <li>نتیجه مورد انتظار و نتیجه واقعی</li>
+  <li>اسکرین‌شات یا لاگ غیرحساس</li>
+</ul>
 
-* نسخه افزونه و نسخه مرورگر
-* مراحل دقیق بازتولید مشکل
-* نتیجه مورد انتظار و نتیجه واقعی
-* اسکرین‌شات یا لاگ‌های غیرحساس
+<h2 dir="rtl">⚠️ محدودیت‌ها</h2>
 
-> [!WARNING]
-> رمز عبور، Cookie، Session token یا اطلاعات شخصی و آموزشی خود را در Issueها منتشر نکنید.
+<ul dir="rtl">
+  <li>
+    دریافت دروس به ساختار فعلی صفحه و جدول
+    <span dir="ltr">SADA</span>
+    وابسته است.
+  </li>
+  <li>فقط داده‌های جدول فعلی و قابل‌مشاهده صفحه استخراج می‌شوند.</li>
+  <li>
+    فایل‌های باینری قدیمی
+    <code dir="ltr">DOC</code>
+    مستقیماً پردازش نمی‌شوند.
+  </li>
+  <li>
+    متن داخل تصویر،
+    <span dir="ltr">Text Box</span>،
+    <span dir="ltr">Header</span>
+    یا
+    <span dir="ltr">Footer</span>
+    فایل
+    <span dir="ltr">Word</span>
+    ممکن است به‌عنوان درس شناسایی نشود.
+  </li>
+  <li>
+    آزمون نهایی روی
+    <span dir="ltr">Session</span>
+    واقعی
+    <span dir="ltr">SADA</span>
+    باید توسط کاربر انجام شود؛ اطلاعات ورود در محدوده پروژه قرار ندارد.
+  </li>
+</ul>
 
-## 📄 مجوز
+<h2 dir="rtl">📄 مجوز</h2>
 
-این پروژه تحت مجوز [MIT](LICENSE) منتشر شده است.
+<p dir="rtl">
+  این پروژه تحت مجوز
+  <a href="./LICENSE"><span dir="ltr">MIT</span></a>
+  منتشر شده است.
+</p>
