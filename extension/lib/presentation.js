@@ -5,17 +5,21 @@ export function persianDigits(value) {
   return String(value).replace(/\d/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
 }
 
-function clock(value) {
+export function formatMinutesToTime(value) {
   const hour = Math.floor(value / 60);
   const minute = value % 60;
   return persianDigits(minute ? `${hour}:${String(minute).padStart(2, '0')}` : hour);
 }
 
+export function formatSessionTime(session) {
+  const week = session.week === 'odd' ? '، هفته‌های فرد' : session.week === 'even' ? '، هفته‌های زوج' : '';
+  return `ساعت ${formatMinutesToTime(session.start)} تا ${formatMinutesToTime(session.end)}${week}`;
+}
+
 export function formatSessions(sessions = []) {
   if (!sessions.length) return 'زمان کلاس هنوز اعلام نشده است';
   return sessions.map((session) => {
-    const week = session.week === 'odd' ? '، هفته‌های فرد' : session.week === 'even' ? '، هفته‌های زوج' : '';
-    return `${classDays[session.day] ?? 'روز نامشخص'}، ساعت ${clock(session.start)} تا ${clock(session.end)}${week}`;
+    return `${classDays[session.day] ?? 'روز نامشخص'}، ${formatSessionTime(session)}`;
   }).join('\n');
 }
 
@@ -64,11 +68,11 @@ export function formatExam(exam) {
   const parts = [];
 
   if (hasTime) {
-    const day = examDay(exam.date);
+    const day = exam.weekday || examDay(exam.date);
     const date = persianDigits(exam.date.replaceAll('-', '/'));
 
-    const startStr = clock(exam.start);
-    const endStr = exam.end != null ? clock(exam.end) : null;
+    const startStr = formatMinutesToTime(exam.start);
+    const endStr = exam.end != null ? formatMinutesToTime(exam.end) : null;
     const timeStr = endStr ? `ساعت ${startStr} تا ${endStr}` : `ساعت ${startStr}`;
 
     const dateParts = [];

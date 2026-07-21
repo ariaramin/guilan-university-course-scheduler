@@ -1,4 +1,5 @@
-import { formatCapacity, formatExam, formatSessions, formatTerm, formatTuition, persianDigits } from './presentation.js';
+import { formatCapacity, formatExam, formatSessions, formatSessionTime, formatTerm, persianDigits } from './presentation.js';
+import { calculateGapsForSessions, formatGapsForDay } from './free-time.js';
 
 const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
 
@@ -17,13 +18,26 @@ export function buildPrintModel(schedules, generatedAt = new Date()) {
         degree: persianDigits(group.degree || 'اعلام نشده'),
         term: formatTerm(group.termId),
         capacity: formatCapacity(group.capacity),
-        tuition: formatTuition(group.tuition),
       })),
       week: days.flatMap((day, dayIndex) => {
         const entries = schedule.groups.flatMap((group) => group.sessions
           .filter((session) => session.day === dayIndex)
-          .map((session) => `${persianDigits(group.title)} — ${formatSessions([session])}`));
-        return entries.length ? [{ day, entries }] : [];
+          .map((session) => `${persianDigits(group.title)} — ${formatSessionTime(session)}`));
+        
+        let gapLine = '';
+        if (entries.length) {
+          const daySessions = schedule.groups.flatMap((g) => g.sessions.filter((s) => s.day === dayIndex));
+          const hasIncomplete = daySessions.some((s) => s.start == null || s.end == null);
+          if (hasIncomplete) {
+            gapLine = 'محاسبه فاصله برای برخی کلاس‌ها ممکن نبود.';
+          } else {
+            const gaps = calculateGapsForSessions(daySessions);
+            if (gaps.length > 0) {
+              gapLine = `فاصله آزاد: ${formatGapsForDay(gaps)}`;
+            }
+          }
+        }
+        return entries.length ? [{ day, entries, gapLine }] : [];
       }),
     })),
   };

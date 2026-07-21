@@ -33,13 +33,21 @@ async function sourceTabs() {
   if (Number.isInteger(pinnedId)) {
     try { return [await chrome.tabs.get(pinnedId)]; } catch { /* fall through to a live SADA tab */ }
   }
-  const tabs = await chrome.tabs.query({ url: `${SADA_ORIGIN}/*`, lastFocusedWindow: true });
+  const tabs = await chrome.tabs.query({ url: `${SADA_ORIGIN}/*` });
   if (!tabs.length) throw new LiveExtractionError('NO_ACTIVE_TAB', 'tab_lookup');
   return [tabs.find((tab) => tab.active) ?? tabs.at(-1)];
 }
 
+const withTimeout = (promise, ms) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), ms))
+]);
+
 async function pingContentScript(tabId, requestId) {
-  const response = await chrome.tabs.sendMessage(tabId, { type: 'PING_SADA_CONTENT_SCRIPT', requestId });
+  const response = await withTimeout(
+    chrome.tabs.sendMessage(tabId, { type: 'PING_SADA_CONTENT_SCRIPT', requestId }),
+    2000
+  );
   if (response?.requestId !== requestId || response.ready !== true || typeof response.version !== 'string' || response.type !== 'PONG_SADA_CONTENT_SCRIPT') {
     throw new LiveExtractionError('INVALID_RESPONSE', 'handshake');
   }
@@ -57,7 +65,10 @@ async function ensureContentScript(tab, requestId, diagnostic) {
   }
   try {
     diagnostic.injectionAttempted = true;
-    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['lib/dom-extractor.js', 'content.js'] });
+    await withTimeout(
+      chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['lib/dom-extractor.js', 'content.js'] }),
+      3000
+    );
   } catch {
     throw new LiveExtractionError('SCRIPT_INJECTION_FAILED', 'injection');
   }
@@ -107,7 +118,11 @@ async function commitExtraction(extraction, trigger, tab) {
     cacheSchemaVersion: dataset.schemaVersion,
     cacheTimestampValid: true,
   };
-  await chrome.storage.local.set({ cachedCourseDataset: dataset, lastLiveDiagnostics: diagnostic });
+  if (changed) {
+    await chrome.storage.local.set({ cachedCourseDataset: dataset, lastLiveDiagnostics: diagnostic });
+  } else {
+    await chrome.storage.local.set({ lastLiveDiagnostics: diagnostic });
+  }
   return {
     requestId: extraction.requestId,
     success: true,
@@ -135,7 +150,11 @@ async function refreshFromTab(tab, requestId, trigger) {
   };
   try {
     await ensureContentScript(tab, requestId, diagnostic);
-    const extraction = await chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_CURRENT_COURSES', requestId });
+    diagnostic.stage = 'extraction';
+    const extraction = await withTimeout(
+      chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_CURRENT_COURSES', requestId }),
+      8000
+    );
     if (latestRequestByTab.get(tab.id) !== requestId) return { requestId, stale: true };
     const result = await commitExtraction(extraction, trigger, tab);
     return { ...result, diagnostic: { ...diagnostic, ...result.diagnostic } };

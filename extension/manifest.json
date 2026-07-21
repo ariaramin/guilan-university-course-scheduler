@@ -1,12 +1,26 @@
 {
   "manifest_version": 3,
   "name": "برنامه‌ریز انتخاب واحد گیلان",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "description": "تحلیل محلی دروس و ساخت برنامه‌های بدون تداخل",
   "permissions": ["storage", "scripting"],
   "host_permissions": ["https://sada.guilan.ac.ir/*"],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
   "background": { "service_worker": "background.js", "type": "module" },
-  "action": { "default_title": "استخراج صفحه و بازکردن برنامه‌ریز" },
+  "action": {
+    "default_title": "استخراج صفحه و بازکردن برنامه‌ریز",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
   "content_scripts": [{
     "matches": ["https://sada.guilan.ac.ir/*"],
     "js": ["lib/dom-extractor.js", "content.js"],

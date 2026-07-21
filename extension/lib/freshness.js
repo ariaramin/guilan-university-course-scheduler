@@ -21,6 +21,7 @@ function stableGroup(group) {
     exam: group.exam ? {
       date: group.exam.date ?? null, start: group.exam.start ?? null, end: group.exam.end ?? null,
       location: normalizeSourceText(group.exam.location ?? ''),
+      weekday: group.exam.weekday ?? null,
     } : null,
   };
 }

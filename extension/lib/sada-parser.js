@@ -1,4 +1,4 @@
-import { minutes, normalizeSourceText } from './normalize.js';
+import { normalizeSourceText, parseLocalizedNumber, parseTimeToMinutes } from './normalize.js';
 
 const fieldAliases = {
   title: ['نام درس', 'عنوان درس', 'درس'],
@@ -110,8 +110,8 @@ export function parseSessions(value) {
   const normalized = normalizedText(value);
   const pattern = /(پنجشنبه|چهارشنبه|سه شنبه|دوشنبه|یکشنبه|شنبه|جمعه)[^\d]*(\d{1,2}:\d{2})\s*(?:-|–|تا)\s*(\d{1,2}:\d{2})/g;
   return [...normalized.matchAll(pattern)].map((match) => {
-    const first = minutes(match[2]);
-    const second = minutes(match[3]);
+    const first = parseTimeToMinutes(match[2]);
+    const second = parseTimeToMinutes(match[3]);
     return {
       day: days.get(match[1]),
       start: Math.min(first, second),
@@ -121,30 +121,60 @@ export function parseSessions(value) {
   });
 }
 
+const weekdayPattern = /(?:^|\s)(پنجشنبه|چهارشنبه|سه\s*شنبه|دوشنبه|یکشنبه|شنبه|جمعه)(?=\s|$)/;
+const weekdayCleanPattern = /(?:^|\s)(?:پنجشنبه|چهارشنبه|سه\s*شنبه|دوشنبه|یکشنبه|شنبه|جمعه)(?=\s|$)/g;
+
+/**
+ * Removes date, time, weekday, and temporal keywords from a raw location string.
+ * Produces only the actual place name (e.g. "دانشکده علوم پایه").
+ */
+export function cleanExamLocation(raw) {
+  if (!raw) return null;
+  let result = String(raw);
+  // Remove Jalali dates (e.g. 1405/04/28 or 1405-04-28)
+  result = result.replace(/14\d{2}[/-]\d{1,2}[/-]\d{1,2}/g, ' ');
+  // Remove bare numeric dates (e.g. standalone 04/28 fragments)
+  result = result.replace(/\b\d{1,2}[/-]\d{1,2}\b/g, ' ');
+  // Remove time patterns (e.g. 8:00, 11:30)
+  result = result.replace(/\b\d{1,2}:\d{2}\b/g, ' ');
+  // Remove standalone numbers (leftover day/month/hour digits)
+  result = result.replace(/(?:^|\s)\d{1,4}(?=\s|$)/g, ' ');
+  // Remove weekday names
+  result = result.replace(weekdayCleanPattern, ' ');
+  // Remove temporal keywords and labels
+  result = result.replace(/(?:^|\s)(?:از|تا|ساعت|پایان ترم|امتحان)(?=\s|$)/g, ' ');
+  // Remove leftover punctuation and separators
+  result = result.replace(/[-–—/*:،,;()[\]]+/g, ' ');
+  // Remove Unicode direction marks and zero-width characters
+  result = result.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
+  // Collapse whitespace
+  result = result.replace(/\s+/g, ' ').trim();
+  return result || null;
+}
+
 export function parseExam(value) {
   const normalized = normalizedText(value);
   if (!normalized || /ندارد/.test(normalized)) return null;
   const date = normalized.match(/(14\d{2})[/-](\d{1,2})[/-](\d{1,2})/);
-  const times = [...normalized.matchAll(/\b(\d{1,2}:\d{2})\b/g)].map((match) => minutes(match[1]));
-  const location = normalized
-    .replace(date?.[0] ?? '', ' ')
-    .replace(/\b\d{1,2}:\d{2}\b/g, ' ')
-    .replace(/پایان ترم|امتحان|[-–—/*]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim() || null;
+  const times = [...normalized.matchAll(/\b(\d{1,2}:\d{2})\b/g)].map((match) => parseTimeToMinutes(match[1]));
+  const weekdayMatch = normalized.match(weekdayPattern);
+  const weekday = weekdayMatch ? weekdayMatch[1].replace(/\s+/g, '') : null;
+  const location = cleanExamLocation(normalized);
   return {
     date: date ? `${date[1]}-${date[2].padStart(2, '0')}-${date[3].padStart(2, '0')}` : null,
     calendar: 'jalali',
     start: times.length >= 2 ? Math.min(...times) : null,
     end: times.length >= 2 ? Math.max(...times) : null,
     location,
+    weekday,
+    raw: normalized,
   };
 }
 
 function parseTuition(value) {
   const normalized = normalizedText(value);
-  const amount = Number(normalized.replace(/[^\d.]/g, ''));
-  if (!normalized || !Number.isFinite(amount)) return null;
+  const amount = parseLocalizedNumber(value);
+  if (!normalized || amount == null) return null;
   const currency = /ریال/.test(normalized) ? 'IRR' : /تومان/.test(normalized) ? 'IRT' : null;
   return { amount, currency, label: null };
 }
@@ -215,9 +245,10 @@ export function parseSadaTables(tables) {
     const { title, groupNumber } = parseTitle(cleanGenderRestrictionLabel(rawTitle, gender));
     const courseId = valueAt(row, indexes.courseId) || stableTextId(title);
     const capacityText = valueAt(row, indexes.capacity);
-    const capacity = /^\d+$/.test(capacityText) ? Number(capacityText) : null;
+    const capacity = parseLocalizedNumber(capacityText);
     const unitsText = valueAt(row, indexes.units);
-    const units = /^\d+(?:\.\d+)?$/.test(unitsText) ? Number(unitsText) : 0;
+    const parsedUnits = parseLocalizedNumber(unitsText);
+    const units = parsedUnits != null ? parsedUnits : 0;
     const sessions = parseSessions(valueAt(row, indexes.schedule));
     const examText = valueAt(row, indexes.exam);
     const exam = parseExam(examText);

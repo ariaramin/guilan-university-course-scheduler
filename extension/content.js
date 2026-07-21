@@ -6,9 +6,13 @@
   const STABILITY_MS = 350;
   const EXTRACTION_TIMEOUT_MS = 6500;
   const OBSERVER_DEBOUNCE_MS = 300;
+
   let liveObserver = null;
   let observerTimer = null;
   let lastPublishedFingerprint = '';
+  let isProcessingLiveUpdate = false;
+  let pendingLiveUpdate = false;
+
   globalThis.__guilanPlannerContent = { version: CONTENT_VERSION };
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -46,12 +50,15 @@
     };
   }
 
+  function scheduleLiveUpdate() {
+    clearTimeout(observerTimer);
+    pendingLiveUpdate = true;
+    observerTimer = setTimeout(() => void processLiveUpdate(), OBSERVER_DEBOUNCE_MS);
+  }
+
   function connectLiveObserver() {
-    liveObserver?.disconnect();
-    liveObserver = new MutationObserver(() => {
-      clearTimeout(observerTimer);
-      observerTimer = setTimeout(() => void publishIfChanged(), OBSERVER_DEBOUNCE_MS);
-    });
+    if (liveObserver) return;
+    liveObserver = new MutationObserver(() => scheduleLiveUpdate());
     for (const root of extractor.observationRoots(document)) {
       liveObserver.observe(root, { childList: true, subtree: true, characterData: true, attributes: true });
     }
@@ -77,9 +84,9 @@
       let timeout = null;
       let stabilityTimer = null;
       let transientObserver = null;
-      
+
       const handleFrameLoad = (event) => { if (event.target?.tagName === 'IFRAME') evaluate(); };
-      
+
       const finish = (result, readiness, errorCode = null) => {
         if (settled) return;
         settled = true;
@@ -92,22 +99,7 @@
         resolve({ ...result, readiness, errorCode, observerStatus: 'connected' });
       };
 
-      const evaluate = () => {
-        if (settled) return;
-        const result = currentExtraction(requestId, startedAt);
-        const ready = result.selectorFound && result.rowCount > 0 && !result.loadingVisible;
-        if (ready) finish(result, 'stable');
-      };
-
-      transientObserver = new MutationObserver(() => {
-        clearTimeout(stabilityTimer);
-        stabilityTimer = setTimeout(evaluate, STABILITY_MS);
-      });
-
-      for (const root of extractor.observationRoots(document)) {
-        transientObserver.observe(root, { childList: true, subtree: true, characterData: true, attributes: true });
-      }
-
+      // Ensure the timeout cannot be bypassed by synchronous exceptions during setup
       timeout = setTimeout(() => {
         if (settled) return;
         const finalResult = currentExtraction(requestId, startedAt);
@@ -118,44 +110,80 @@
         finish(finalResult, 'timeout', errorCode);
       }, EXTRACTION_TIMEOUT_MS);
 
+      const evaluate = () => {
+        if (settled) return;
+        try {
+          const readiness = extractor.checkTableReadiness(document);
+          const ready = readiness.selectorFound && readiness.rowCount > 0 && !readiness.loadingVisible;
+          if (ready) {
+            const result = currentExtraction(requestId, startedAt);
+            finish(result, 'stable');
+          }
+        } catch (error) {
+          if (globalThis.__SADA_DEBUG_LIVE__) console.debug('SADA evaluation error', error);
+        }
+      };
+
+      try {
+        transientObserver = new MutationObserver(() => {
+          clearTimeout(stabilityTimer);
+          stabilityTimer = setTimeout(evaluate, STABILITY_MS);
+        });
+
+        for (const root of extractor.observationRoots(document)) {
+          if (root instanceof Node) {
+            transientObserver.observe(root, { childList: true, subtree: true, characterData: true, attributes: true });
+          }
+        }
+      } catch (error) {
+        if (globalThis.__SADA_DEBUG_LIVE__) console.debug('SADA observer setup error', error);
+      }
+
       document.addEventListener('load', handleFrameLoad, true);
       stabilityTimer = setTimeout(evaluate, STABILITY_MS);
     });
   }
 
-  async function publishIfChanged() {
-    const startedAt = performance.now();
-    const result = currentExtraction(`observer-${Date.now()}`, startedAt);
-    
-    if (!result.selectorFound || !result.rowCount || result.loadingVisible || result.fingerprint === lastPublishedFingerprint) {
-      connectLiveObserver();
-      return;
-    }
-    
+  async function processLiveUpdate() {
+    if (isProcessingLiveUpdate) return;
+    isProcessingLiveUpdate = true;
+    pendingLiveUpdate = false;
+
     try {
+      const startedAt = performance.now();
+      const readiness = extractor.checkTableReadiness(document);
+
+      if (!readiness.selectorFound || readiness.rowCount === 0 || readiness.loadingVisible) {
+        return;
+      }
+
+      const result = currentExtraction(`observer-${Date.now()}`, startedAt);
+
+      if (result.fingerprint === lastPublishedFingerprint) {
+        return;
+      }
+
       const response = await chrome.runtime.sendMessage({
         type: 'SADA_TABLES_CHANGED',
         extraction: { ...result, success: true, readiness: 'stable', observerStatus: 'connected' },
       });
       if (response?.ok) lastPublishedFingerprint = result.fingerprint;
-      else if (response?.retry) {
-        clearTimeout(observerTimer);
-        observerTimer = setTimeout(() => void publishIfChanged(), OBSERVER_DEBOUNCE_MS);
-      }
+      else if (response?.retry) pendingLiveUpdate = true;
     } catch {
-      // A later focus/manual refresh re-establishes the worker connection.
+      // Ignored
     } finally {
-      connectLiveObserver();
+      isProcessingLiveUpdate = false;
+      if (pendingLiveUpdate) scheduleLiveUpdate();
     }
   }
 
   addEventListener('pagehide', () => {
     liveObserver?.disconnect();
+    liveObserver = null;
     clearTimeout(observerTimer);
   });
   document.addEventListener('load', (event) => {
     if (event.target?.tagName !== 'IFRAME') return;
-    clearTimeout(observerTimer);
-    observerTimer = setTimeout(() => void publishIfChanged(), OBSERVER_DEBOUNCE_MS);
+    scheduleLiveUpdate();
   }, true);
 })();

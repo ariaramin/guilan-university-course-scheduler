@@ -4,6 +4,12 @@ export function englishDigits(value) {
   return String(value).replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
 }
 
+export function parseLocalizedNumber(value) {
+  if (value == null) return null;
+  const num = Number(englishDigits(value).replace(/[^\d.-]/g, ''));
+  return Number.isFinite(num) ? num : null;
+}
+
 export function normalizeSourceText(value) {
   return englishDigits(value ?? '')
     .normalize('NFKC')
@@ -18,7 +24,7 @@ export function normalizeSourceText(value) {
     .trim();
 }
 
-export function minutes(value) {
+export function parseTimeToMinutes(value) {
   const match = englishDigits(value).trim().match(/^(\d{1,2}):(\d{2})$/);
   if (!match) throw new TypeError(`Invalid time: ${value}`);
   const hour = Number(match[1]);
@@ -28,8 +34,8 @@ export function minutes(value) {
 }
 
 function normalizedSession(session) {
-  const start = typeof session.start === 'number' ? session.start : minutes(session.start);
-  const end = typeof session.end === 'number' ? session.end : minutes(session.end);
+  const start = typeof session.start === 'number' ? session.start : parseTimeToMinutes(session.start);
+  const end = typeof session.end === 'number' ? session.end : parseTimeToMinutes(session.end);
   if (!Number.isInteger(session.day) || session.day < 0 || session.day > 6 || start >= end) {
     throw new RangeError('Each session needs day 0..6 and start before end.');
   }
@@ -53,9 +59,11 @@ export function normalizeGroup(group) {
   validateExpression(group.corequisites);
   const exam = group.exam && group.exam.start != null ? {
     ...group.exam,
-    start: typeof group.exam.start === 'number' ? group.exam.start : minutes(group.exam.start),
-    end: typeof group.exam.end === 'number' ? group.exam.end : minutes(group.exam.end),
-  } : group.exam ?? null;
+    start: typeof group.exam.start === 'number' ? group.exam.start : parseTimeToMinutes(group.exam.start),
+    end: typeof group.exam.end === 'number' ? group.exam.end : parseTimeToMinutes(group.exam.end),
+    weekday: group.exam.weekday ?? null,
+    raw: group.exam.raw ?? null,
+  } : group.exam ? { ...group.exam, weekday: group.exam.weekday ?? null, raw: group.exam.raw ?? null } : null;
   if (exam?.start != null && exam.start >= exam.end) throw new RangeError('Exam start must be before end.');
   if (group.genderRestriction != null && !['male', 'female'].includes(group.genderRestriction)) {
     throw new TypeError('Gender restriction must be male, female, or null.');

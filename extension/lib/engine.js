@@ -66,16 +66,43 @@ export function unitRank(schedule, targetUnits) {
 }
 
 function rankSchedules(a, b, targetUnits) {
-  const left = unitRank(a, targetUnits);
-  const right = unitRank(b, targetUnits);
-  return left.bucket - right.bucket || left.distance - right.distance ||
-    b.chartMatchedCount - a.chartMatchedCount ||
-    b.preferredCount - a.preferredCount ||
-    b.capacityScore - a.capacityScore ||
-    a.attendanceDays - b.attendanceDays ||
-    a.gapMinutes - b.gapMinutes ||
-    b.groups.length - a.groups.length ||
-    b.units - a.units;
+  const aRank = unitRank(a, targetUnits);
+  const bRank = unitRank(b, targetUnits);
+
+  const bucketDiff = aRank.bucket - bRank.bucket;
+  if (bucketDiff !== 0) return bucketDiff;
+
+  const distDiff = aRank.distance - bRank.distance;
+  if (distDiff !== 0) return distDiff;
+
+  const aComp = (a.unitsComplete ?? (a.unknownUnitCount === 0)) ? 1 : 0;
+  const bComp = (b.unitsComplete ?? (b.unknownUnitCount === 0)) ? 1 : 0;
+  const compDiff = bComp - aComp;
+  if (compDiff !== 0) return compDiff;
+
+  const chartDiff = b.chartMatchedCount - a.chartMatchedCount;
+  if (chartDiff !== 0) return chartDiff;
+
+  const prefDiff = b.preferredCount - a.preferredCount;
+  if (prefDiff !== 0) return prefDiff;
+
+  const capDiff = b.capacityScore - a.capacityScore;
+  if (capDiff !== 0) return capDiff;
+
+  const aDays = a.attendanceDays ?? 0;
+  const bDays = b.attendanceDays ?? 0;
+  const daysDiff = aDays - bDays;
+  if (daysDiff !== 0) return daysDiff;
+
+  const aGaps = a.gapMinutes ?? 0;
+  const bGaps = b.gapMinutes ?? 0;
+  const gapsDiff = aGaps - bGaps;
+  if (gapsDiff !== 0) return gapsDiff;
+
+  const lenDiff = b.groups.length - a.groups.length;
+  if (lenDiff !== 0) return lenDiff;
+
+  return b.units - a.units;
 }
 
 export function generateSchedules(groups, options = {}) {
@@ -94,7 +121,7 @@ export function generateSchedules(groups, options = {}) {
   const targetCount = options.targetCount ?? null;
   const required = new Set(requiredGroupIds);
   const preferred = new Set(preferredGroupIds);
-  const schedulableGroups = groups.filter((group) => group.unitsKnown !== false);
+  const schedulableGroups = groups;
   const byCourse = new Map();
   for (const group of schedulableGroups) {
     byCourse.set(group.courseId, [...(byCourse.get(group.courseId) ?? []), group]);
@@ -116,6 +143,7 @@ export function generateSchedules(groups, options = {}) {
 
   let states = [{
     groups: [], groupIds: [], units: 0,
+    unknownUnitCount: 0,
     preferredCount: 0, chartMatchedCount: 0, capacityScore: 0,
   }];
   for (const courseGroups of courses) {
@@ -136,6 +164,7 @@ export function generateSchedules(groups, options = {}) {
           groups: [...state.groups, group],
           groupIds: [...state.groupIds, group.id],
           units,
+          unknownUnitCount: state.unknownUnitCount + (group.unitsKnown === false ? 1 : 0),
           preferredCount: state.preferredCount + Number(preferred.has(group.id)),
           chartMatchedCount: state.chartMatchedCount + Number(prioritizeChart && ['matched', 'probable_match'].includes(group.chartStatus)),
           capacityScore: state.capacityScore + Math.max(0, group.capacity ?? 0),
@@ -143,11 +172,7 @@ export function generateSchedules(groups, options = {}) {
       }
     }
     // ponytail: bounded beam keeps 500-course input responsive; raise beamWidth if measured recall is insufficient.
-    const ranked = next.sort((a, b) => rankSchedules(
-      { ...a, attendanceDays: 0, gapMinutes: 0 },
-      { ...b, attendanceDays: 0, gapMinutes: 0 },
-      targetUnits,
-    ));
+    const ranked = next.sort((a, b) => rankSchedules(a, b, targetUnits));
     states = ranked.slice(0, beamWidth);
   }
 
@@ -166,8 +191,8 @@ export function generateSchedules(groups, options = {}) {
       groups: state.groups,
       units: state.units,
       knownUnits: state.units,
-      unknownUnitCount: 0,
-      unitsComplete: true,
+      unknownUnitCount: state.unknownUnitCount,
+      unitsComplete: state.unknownUnitCount === 0,
       preferredCount: state.preferredCount,
       chartMatchedCount: state.chartMatchedCount,
       warnings: checks.flatMap((check) => check.warnings),

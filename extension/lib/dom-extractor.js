@@ -1,26 +1,39 @@
 (function installDomTableExtractor() {
   function textOf(cell) {
     if (!cell) return '';
+    if (typeof cell.cloneNode !== 'function') return (cell.textContent || '').trim().replace(/\s+/g, ' ');
     const clone = cell.cloneNode(true);
-    const hidden = clone.querySelectorAll('[style*="display:none"],[style*="display: none"],[style*="visibility:hidden"],[style*="visibility: hidden"],.hidden,.visually-hidden');
-    hidden.forEach((el) => el.remove());
-    clone.querySelectorAll('br, p, div, tr').forEach((el) => el.after('\n'));
-    return clone.textContent.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+    for (const hidden of clone.querySelectorAll('.hidden, [style*="display: none"], [style*="display:none"]')) {
+      hidden.remove();
+    }
+    return clone.textContent.trim().replace(/\s+/g, ' ');
   }
 
-  function extractDocument(doc, framePath, result) {
+  function gatherTableElements(doc, framePath, result) {
     for (const table of doc.querySelectorAll('table')) {
       if (table.getClientRects().length === 0) continue;
-      const rows = [...table.rows].map((row) => [...row.cells].map(textOf));
-      if (rows.length) result.tables.push({ tableIndex: result.tables.length, framePath, rows });
+      const domRows = [...table.rows];
+      const sampleCells = domRows.length ? [...domRows[0].cells] : [];
+      result.tables.push({
+        type: 'table',
+        element: table,
+        framePath,
+        rowCount: domRows.length,
+        width: sampleCells.length
+      });
     }
 
     for (const grid of doc.querySelectorAll('[role="grid"], [role="table"]')) {
       if (grid.tagName === 'TABLE' || grid.querySelector?.('table') || grid.getClientRects().length === 0) continue;
-      const rows = [...grid.querySelectorAll('[role="row"]')].map((row) =>
-        [...row.querySelectorAll('[role="columnheader"], [role="gridcell"], [role="cell"]')].map(textOf),
-      ).filter((row) => row.length);
-      if (rows.length) result.tables.push({ tableIndex: result.tables.length, framePath, rows });
+      const domRows = [...grid.querySelectorAll('[role="row"]')];
+      const sampleCells = domRows.length ? [...domRows[0].querySelectorAll('[role="columnheader"], [role="gridcell"], [role="cell"]')] : [];
+      result.tables.push({
+        type: 'grid',
+        element: grid,
+        framePath,
+        rowCount: domRows.length,
+        width: sampleCells.length
+      });
     }
 
     [...doc.querySelectorAll('iframe')].forEach((frame, index) => {
@@ -31,7 +44,7 @@
           result.unreadableFrames += 1;
           return;
         }
-        extractDocument(frame.contentDocument, `${framePath}.${index}`, result);
+        gatherTableElements(frame.contentDocument, `${framePath}.${index}`, result);
       } catch {
         result.unreadableFrames += 1;
       }
@@ -116,12 +129,23 @@
     return { score, hasTitle, hasSchedule };
   }
 
-  function courseTableStatus(tables) {
+  function findBestTable(gatheredResult) {
     let bestTable = null;
     let maxScore = -1;
 
-    for (const table of tables) {
-      const scoreResult = scoreRows(table.rows);
+    for (const table of gatheredResult.tables) {
+      if (table.rowCount === 0) continue;
+
+      let sampleRows = [];
+      if (table.type === 'table') {
+        sampleRows = [...table.element.rows].slice(0, 3).map((row) => [...row.cells].map(textOf));
+      } else {
+        sampleRows = [...table.element.querySelectorAll('[role="row"]')].slice(0, 3).map((row) =>
+          [...row.querySelectorAll('[role="columnheader"], [role="gridcell"], [role="cell"]')].map(textOf)
+        ).filter((row) => row.length);
+      }
+
+      const scoreResult = scoreRows(sampleRows);
       if (scoreResult.score > maxScore) {
         maxScore = scoreResult.score;
         bestTable = table;
@@ -129,31 +153,70 @@
     }
 
     if (!bestTable || maxScore < 25) {
-      return { selectorFound: false, rowCount: 0, confidence: 0 };
+      return { selectorFound: false, rowCount: 0, confidence: 0, bestTable: null };
     }
 
-    let rowCount = Math.max(0, bestTable.rows.length - 1);
+    let rowCount = Math.max(0, bestTable.rowCount - 1);
     if (!rowCount) {
-      const width = bestTable.rows[0].length;
-      rowCount = tables
-        .filter((table) => table !== bestTable && table.framePath === bestTable.framePath)
-        .flatMap((table) => table.rows)
-        .filter((row) => row.length === width).length;
+      const width = bestTable.width;
+      rowCount = gatheredResult.tables
+        .filter((table) => table !== bestTable && table.framePath === bestTable.framePath && table.width === width)
+        .reduce((sum, table) => sum + table.rowCount, 0);
     }
 
-    return { selectorFound: true, rowCount, confidence: maxScore };
+    return { selectorFound: true, rowCount, confidence: maxScore, bestTable };
   }
 
   globalThis.sadaDomExtractor = {
+    checkTableReadiness(doc) {
+      const result = { tables: [], visibleFrames: 0, unreadableFrames: 0 };
+      gatherTableElements(doc, 'top', result);
+      const status = findBestTable(result);
+      return {
+        selectorFound: status.selectorFound,
+        rowCount: status.rowCount,
+        loadingVisible: this.hasVisibleLoadingIndicator(doc)
+      };
+    },
     extractVisibleTables(doc) {
       const result = { tables: [], visibleFrames: 0, unreadableFrames: 0 };
-      extractDocument(doc, 'top', result);
-      const courseStatus = courseTableStatus(result.tables);
+      gatherTableElements(doc, 'top', result);
+      const status = findBestTable(result);
+
+      const extractedTables = [];
+      let totalRowCount = 0;
+
+      if (status.selectorFound) {
+        const parts = result.tables.filter((table) =>
+          table === status.bestTable ||
+          (status.bestTable.rowCount - 1 <= 0 && table.framePath === status.bestTable.framePath && table.width === status.bestTable.width)
+        );
+
+        for (const part of parts) {
+          let rows = [];
+          if (part.type === 'table') {
+            rows = [...part.element.rows].map((row) => [...row.cells].map(textOf));
+          } else {
+            rows = [...part.element.querySelectorAll('[role="row"]')].map((row) =>
+              [...row.querySelectorAll('[role="columnheader"], [role="gridcell"], [role="cell"]')].map(textOf)
+            ).filter((row) => row.length);
+          }
+          if (rows.length) {
+            extractedTables.push({ tableIndex: extractedTables.length, framePath: part.framePath, rows });
+            totalRowCount += Math.max(0, rows.length - (part === status.bestTable ? 1 : 0));
+          }
+        }
+      }
+
       return {
-        ...result,
-        totalRowCount: result.tables.reduce((count, table) => count + Math.max(0, table.rows.length - 1), 0),
-        ...courseStatus,
-        fingerprint: tableFingerprint(result.tables),
+        visibleFrames: result.visibleFrames,
+        unreadableFrames: result.unreadableFrames,
+        tables: extractedTables,
+        totalRowCount: status.selectorFound ? status.rowCount : 0,
+        selectorFound: status.selectorFound,
+        rowCount: status.rowCount,
+        confidence: status.confidence,
+        fingerprint: tableFingerprint(extractedTables),
       };
     },
     hasVisibleLoadingIndicator(doc) {
