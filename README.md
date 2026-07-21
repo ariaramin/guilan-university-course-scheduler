@@ -11,9 +11,6 @@
 </p>
 
 <p align="center" dir="ltr">
-  <a href="https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml">
-    <img src="https://github.com/ariaramin/guilan-university-course-scheduler/actions/workflows/ci.yml/badge.svg" alt="CI status" />
-  </a>
   <a href="./extension/manifest.json">
     <img src="https://img.shields.io/badge/version-1.0.0-0969da" alt="Version 1.0.0" />
   </a>
