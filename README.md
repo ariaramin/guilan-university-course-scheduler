@@ -6,7 +6,7 @@
 
 <p align="center" dir="rtl">
   افزونه‌ای محلی برای خواندن دروس ارائه‌شده در سامانه
-  <span dir="ltr">SADA</span>،
+  سادا،
   تطبیق چارت درسی و ساخت برنامه‌های بدون تداخل کلاسی و امتحانی.
 </p>
 
@@ -29,7 +29,7 @@
   یک افزونه
   <span dir="ltr">Chrome</span>
   برای ساده‌تر کردن بررسی دروس ارائه‌شده در سامانه
-  <span dir="ltr">SADA</span>
+  سادا
   است. افزونه جدول فعلی دروس را از صفحه باز سامانه می‌خواند، امکان تطبیق آن با فایل چارت درسی را فراهم می‌کند و بر اساس محدودیت‌ها و ترجیح‌های کاربر، برنامه‌های پیشنهادی می‌سازد.
 </p>
 
@@ -167,7 +167,7 @@ cd guilan-university-course-scheduler</code></pre>
 <ol dir="rtl" start="6">
   <li>
     صفحه فهرست دروس در سامانه
-    <span dir="ltr">SADA</span>
+    سادا
     را باز یا بازخوانی کنید و سپس روی آیکن افزونه کلیک کنید.
   </li>
 </ol>
@@ -184,7 +184,7 @@ cd guilan-university-course-scheduler</code></pre>
 <ol dir="rtl">
   <li>
     وارد سامانه
-    <span dir="ltr">SADA</span>
+    سادا
     شوید و صفحه‌ای را باز کنید که جدول دروس ارائه‌شده در آن نمایش داده می‌شود.
   </li>
   <li>روی آیکن افزونه کلیک کنید تا صفحه برنامه‌ریز باز شود.</li>
@@ -320,7 +320,7 @@ cd guilan-university-course-scheduler</code></pre>
   </li>
   <li>
     صفحه
-    <span dir="ltr">SADA</span>
+    سادا
     را بازخوانی کنید.
   </li>
   <li>
@@ -468,7 +468,7 @@ Verify extension/manifest.json</code></pre>
 <ul dir="rtl">
   <li>
     دریافت دروس به ساختار فعلی صفحه و جدول
-    <span dir="ltr">SADA</span>
+    سادا
     وابسته است.
   </li>
   <li>فقط داده‌های جدول فعلی و قابل‌مشاهده صفحه استخراج می‌شوند.</li>
@@ -491,7 +491,7 @@ Verify extension/manifest.json</code></pre>
     آزمون نهایی روی
     <span dir="ltr">Session</span>
     واقعی
-    <span dir="ltr">SADA</span>
+    سادا
     باید توسط کاربر انجام شود؛ اطلاعات ورود در محدوده پروژه قرار ندارد.
   </li>
 </ul>
