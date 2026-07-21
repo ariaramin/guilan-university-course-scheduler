@@ -1,26 +1,32 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>برنامه‌ریز انتخاب واحد</title>
   <link rel="stylesheet" href="dashboard.css">
 </head>
+
 <body>
   <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
   <header class="topbar">
     <div class="brand">
       <span class="brand-logo-frame">
-        <img class="brand-logo" src="assets/university-of-guilan-logo.jpg" alt="نشان دانشگاه گیلان" width="1467" height="1750">
+        <img class="brand-logo" src="assets/university-of-guilan-logo.jpg" alt="نشان دانشگاه گیلان" width="1467"
+          height="1750">
       </span>
-      <div class="brand-copy"><p>در بستر دانشگاه گیلان</p><h1>برنامه‌ریز انتخاب واحد</h1></div>
+      <div class="brand-copy">
+        <p>در بستر دانشگاه گیلان</p>
+        <h1>برنامه‌ریز انتخاب واحد</h1>
+      </div>
     </div>
     <div class="topbar-meta">
       <div class="status-row">
         <div id="status" class="status" role="status" aria-live="polite">در حال خواندن اطلاعات درس‌ها…</div>
-        <button id="refresh-courses" class="refresh-courses" type="button" aria-label="دریافت دوباره دروس از صفحه باز سامانه">به‌روزرسانی دروس</button>
+        <button id="refresh-courses" class="refresh-courses" type="button"
+          aria-label="دریافت دوباره دروس از صفحه باز سامانه">به‌روزرسانی دروس</button>
       </div>
-      <p class="independence-notice">این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد.</p>
     </div>
   </header>
 
@@ -39,10 +45,11 @@
       </summary>
       <div class="chart-content">
         <label id="chart-drop" class="drop-zone">
-          <input id="chart-file" class="visually-hidden" type="file" accept=".docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword">
+          <input id="chart-file" class="visually-hidden" type="file"
+            accept=".docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword">
           <strong>فایل چارت را اینجا رها کنید یا برای انتخاب کلیک کنید</strong>
           <span>DOCX پیشنهادی است؛ فایل قدیمی DOC باید ابتدا تبدیل شود · حداکثر ۲۰ مگابایت</span>
-          <small>پردازش در همین مرورگر انجام می‌شود و فایل اصلی ذخیره یا ارسال نمی‌شود.</small>
+          <small>پردازش در همین مرورگر انجام می‌شود و فایل اصلی ذخیره یا ارسال نمی‌شود</small>
         </label>
         <div class="chart-result">
           <div class="chart-file-row">
@@ -51,7 +58,8 @@
           </div>
           <div id="chart-progress" class="progress" role="status" aria-live="polite"></div>
           <div id="chart-stats" class="stats" aria-label="خلاصه پردازش فایل"></div>
-          <button id="confirm-chart" class="button-primary confirm-chart" type="button" hidden>تأیید و اعمال چارت</button>
+          <button id="confirm-chart" class="button-primary confirm-chart" type="button" hidden>تأیید و اعمال
+            چارت</button>
           <details id="chart-review" class="review" hidden>
             <summary>بازبینی موارد شناسایی‌شده</summary>
             <div id="chart-review-list" class="review-list"></div>
@@ -71,53 +79,119 @@
 
     <section class="filters panel" aria-labelledby="filter-title">
       <div class="filter-heading">
-        <div><h2 id="filter-title">جست‌وجو و فیلتر</h2><span id="course-count" class="count"></span></div>
-        <button id="filter-toggle" class="button-secondary mobile-only" type="button" aria-expanded="false" aria-controls="filter-panel">فیلترها</button>
+        <div>
+          <h2 id="filter-title">جست‌وجو و فیلتر</h2><span id="course-count" class="count"></span>
+        </div>
+        <button id="filter-toggle" class="button-secondary mobile-only" type="button" aria-expanded="false"
+          aria-controls="filter-panel">فیلترها</button>
       </div>
       <div id="filter-panel" class="filter-panel">
-        <div class="filter-panel-head mobile-only"><strong>فیلتر درس‌ها</strong><button id="filter-close" class="button-ghost" type="button">بستن</button></div>
+        <div class="filter-panel-head mobile-only"><strong>فیلتر درس‌ها</strong><button id="filter-close"
+            class="button-ghost" type="button">بستن</button></div>
         <div class="primary-filters">
-          <label class="wide-field"><span>نام درس</span><input id="title-filter" type="search" autocomplete="off" placeholder="مثلاً ریاضی عمومی"></label>
-          <label><span>استاد</span><input id="instructor-filter" type="search" autocomplete="off" placeholder="نام استاد"></label>
-          <label><span>روز کلاس</span><select id="day-filter"><option value="">همه روزها</option><option value="0">شنبه</option><option value="1">یکشنبه</option><option value="2">دوشنبه</option><option value="3">سه‌شنبه</option><option value="4">چهارشنبه</option><option value="5">پنجشنبه</option><option value="6">جمعه</option></select></label>
-          <label><span>مقطع</span><select id="degree-filter"><option value="">همه مقاطع</option></select></label>
-          <label><span>ترم</span><select id="term-filter"><option value="">همه ترم‌ها</option></select></label>
-          <label class="target-field"><span>واحد هدف <small>اختیاری</small></span><input id="target-units" type="text" inputmode="numeric" pattern="[۰-۹٠-٩0-9]*" value="۲۰"></label>
-          <label class="check-field"><input id="capacity-only" type="checkbox"><span>فقط دارای ظرفیت</span></label>
+          <label class="wide-field"><span>نام درس</span><input id="title-filter" type="search" autocomplete="off"
+              placeholder="مثلاً ریاضی عمومی"></label>
+          <label><span>استاد</span><input id="instructor-filter" type="search" autocomplete="off"
+              placeholder="نام استاد"></label>
+          <label><span>روز کلاس</span><select id="day-filter">
+              <option value="">همه روزها</option>
+              <option value="0">شنبه</option>
+              <option value="1">یکشنبه</option>
+              <option value="2">دوشنبه</option>
+              <option value="3">سه‌شنبه</option>
+              <option value="4">چهارشنبه</option>
+              <option value="5">پنجشنبه</option>
+              <option value="6">جمعه</option>
+            </select></label>
+          <label><span>مقطع</span><select id="degree-filter">
+              <option value="">همه مقاطع</option>
+            </select></label>
+          <label><span>ترم</span><select id="term-filter">
+              <option value="">همه ترم‌ها</option>
+            </select></label>
+          <label class="target-field"><span>واحد هدف</span><input id="target-units" type="text" value="۲۰"><span
+              id="target-units-error" class="input-error-msg"></span></label>
         </div>
         <details class="advanced-filters">
           <summary>فیلترهای بیشتر</summary>
           <div class="advanced-grid">
-            <label class="target-field"><span>تعداد درس <small>اختیاری</small></span><input id="target-count" type="text" inputmode="numeric" pattern="[۰-۹٠-٩0-9]*" placeholder="مثلاً ۷"></label>
-            <label><span>تعداد واحد درس</span><select id="unit-filter"><option value="">همه</option><option value="unknown">نامشخص</option><option value="1">۱</option><option value="2">۲</option><option value="3">۳</option><option value="4">۴ و بیشتر</option></select></label>
-            <label><span>مرتب‌سازی</span><select id="sort-by"><option value="name">نام درس</option><option value="capacity">ظرفیت باقی‌مانده</option><option value="units">تعداد واحد</option><option value="chart">وضعیت چارت</option></select></label>
-            <label><span>گروه‌بندی</span><select id="group-by"><option value="">بدون گروه‌بندی</option><option value="day">روز کلاس</option><option value="term">ترم</option><option value="degree">مقطع</option><option value="chart">وضعیت چارت</option></select></label>
-            <label><span>جنسیت مجاز</span><select id="gender-filter"><option value="">همه</option><option value="male">آقایان</option><option value="female">بانوان</option></select></label>
-            <label><span>وضعیت چارت</span><select id="chart-filter"><option value="">همه درس‌ها</option><option value="matched">در چارت شما</option><option value="unmatched">خارج از چارت</option></select></label>
-            <label class="passed-field"><span>درس‌های گذرانده</span><textarea id="passed-courses" rows="2" placeholder="هر درس را در یک خط بنویسید"></textarea></label>
+            <label class="target-field"><span>تعداد درس <small>اختیاری</small></span><input id="target-count"
+                type="text" placeholder="مثلاً ۷"><span id="target-count-error" class="input-error-msg"></span></label>
+            <label><span>تعداد واحد درس</span><select id="unit-filter">
+                <option value="">همه</option>
+                <option value="known">فقط مشخص</option>
+                <option value="unknown">نامشخص</option>
+                <option value="1">۱</option>
+                <option value="2">۲</option>
+                <option value="3">۳</option>
+                <option value="4">۴ و بیشتر</option>
+              </select></label>
+            <label><span>مرتب‌سازی</span><select id="sort-by">
+                <option value="name">نام درس</option>
+                <option value="capacity">ظرفیت باقی‌مانده</option>
+                <option value="units">تعداد واحد</option>
+                <option value="chart">وضعیت چارت</option>
+              </select></label>
+            <label><span>گروه‌بندی</span><select id="group-by">
+                <option value="">بدون گروه‌بندی</option>
+                <option value="day">روز کلاس</option>
+                <option value="term">ترم</option>
+                <option value="degree">مقطع</option>
+                <option value="chart">وضعیت چارت</option>
+              </select></label>
+            <label><span>جنسیت مجاز</span><select id="gender-filter">
+                <option value="">همه</option>
+                <option value="male">آقایان</option>
+                <option value="female">بانوان</option>
+              </select></label>
+            <label><span>وضعیت چارت</span><select id="chart-filter">
+                <option value="">همه درس‌ها</option>
+                <option value="matched">در چارت شما</option>
+                <option value="unmatched">خارج از چارت</option>
+              </select></label>
             <div class="advanced-checks">
               <label class="check-field"><input id="show-full" type="checkbox"><span>نمایش تکمیل‌ظرفیت</span></label>
-              <label class="check-field"><input id="prioritize-chart" type="checkbox" checked><span>اولویت با چارت</span></label>
+              <label class="check-field"><input id="prioritize-chart" type="checkbox" checked><span>اولویت با
+                  چارت</span></label>
+              <label class="check-field"><input id="capacity-only" type="checkbox"><span>فقط دارای ظرفیت</span></label>
             </div>
           </div>
         </details>
       </div>
-      <button id="filter-scrim" class="filter-scrim mobile-only" type="button" aria-label="بستن فیلترها" tabindex="-1"></button>
+      <button id="filter-scrim" class="filter-scrim mobile-only" type="button" aria-label="بستن فیلترها"
+        tabindex="-1"></button>
       <div id="active-filters" class="active-filters" aria-label="فیلترهای فعال"></div>
     </section>
 
     <section class="courses panel" aria-labelledby="courses-title">
-      <div class="section-heading"><div><h2 id="courses-title">دروس ارائه‌شده</h2><p>نام درس را برای جزئیات انتخاب کنید.</p></div></div>
-      <p id="course-table-hint" class="visually-hidden">جدول در صفحه‌های کوچک به‌صورت افقی پیمایش می‌شود. برای بازکردن جزئیات هر درس، روی نام آن بروید و کلید ورود را بزنید.</p>
-      <div id="course-scroll" class="virtual-scroll" role="grid" aria-label="فهرست مجازی دروس" aria-describedby="course-table-hint" tabindex="0">
-        <div class="grid-header" role="row"><span role="columnheader">نام درس</span><span role="columnheader">نام استاد</span><span role="columnheader">برنامه زمانی</span><span role="columnheader">زمان و مکان امتحان</span><span role="columnheader">مقطع</span><span role="columnheader">ترم</span><span role="columnheader">ظرفیت باقی‌مانده</span><span role="columnheader">شهریه</span></div>
-        <div id="course-spacer" class="virtual-spacer"><div id="course-list" class="virtual-window"><div class="skeleton-list" aria-label="در حال بارگذاری"><i></i><i></i><i></i><i></i></div></div></div>
+      <div class="section-heading">
+        <div>
+          <h2 id="courses-title">دروس ارائه‌شده</h2>
+          <p>نام درس را برای جزئیات انتخاب کنید</p>
+        </div>
+      </div>
+      <p id="course-table-hint" class="visually-hidden">جدول در صفحه‌های کوچک به‌صورت افقی پیمایش می‌شود. برای بازکردن
+        جزئیات هر درس، روی نام آن بروید و کلید ورود را بزنید</p>
+      <div id="course-scroll" class="virtual-scroll" role="grid" aria-label="فهرست مجازی دروس"
+        aria-describedby="course-table-hint" tabindex="0">
+        <div class="grid-header" role="row"><span role="columnheader">نام درس</span><span role="columnheader">نام
+            استاد</span><span role="columnheader">برنامه زمانی</span><span role="columnheader">زمان و مکان
+            امتحان</span><span role="columnheader">مقطع</span><span role="columnheader">ترم</span><span
+            role="columnheader">ظرفیت باقی‌مانده</span><span role="columnheader">شهریه</span></div>
+        <div id="course-spacer" class="virtual-spacer">
+          <div id="course-list" class="virtual-window">
+            <div class="skeleton-list" aria-label="در حال بارگذاری"><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="suggestions panel" aria-labelledby="suggestions-title">
       <div class="section-heading suggestion-heading">
-        <div><h2 id="suggestions-title">برنامه‌های پیشنهادی</h2><p>به‌روزرسانی خودکار با تغییر فیلترها</p></div>
+        <div>
+          <h2 id="suggestions-title">برنامه‌های پیشنهادی</h2>
+          <p>به‌روزرسانی خودکار با تغییر فیلترها</p>
+        </div>
         <div class="suggestion-actions">
           <span id="generation-indicator" class="generation-indicator" aria-live="polite"></span>
         </div>
@@ -126,29 +200,30 @@
       <div id="results">
         <div class="empty" role="status">
           <img src="assets/university-of-guilan-logo.jpg" alt="" width="1467" height="1750" aria-hidden="true">
-          <p>پس از دریافت درس‌ها، پیشنهادها خودکار ساخته می‌شوند.</p>
+          <p>پس از دریافت درس‌ها، پیشنهادها خودکار ساخته می‌شوند</p>
         </div>
       </div>
     </section>
 
     <section class="about panel" aria-labelledby="about-title">
-      <img src="assets/university-of-guilan-logo.jpg" alt="نشان دانشگاه گیلان" width="1467" height="1750" loading="lazy" decoding="async">
+      <img src="assets/university-of-guilan-logo.jpg" alt="نشان دانشگاه گیلان" width="1467" height="1750" loading="lazy"
+        decoding="async">
       <div>
         <h2 id="about-title">درباره برنامه‌ریز</h2>
-        <p class="product-description">ابزاری محلی برای مرور درس‌های ارائه‌شده، تطبیق چارت و پیشنهاد انتخاب‌های بدون تداخل، بدون ارسال داده به سرور خارجی.</p>
-        <p class="about-notice">این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد.</p>
+        <p class="product-description">ابزاری محلی برای مرور درس‌های ارائه‌شده، تطبیق چارت و پیشنهاد انتخاب‌های بدون تداخل، بدون ارسال داده به سرور خارجی</p>
       </div>
     </section>
   </main>
 
   <footer class="app-footer">
     <div class="app-footer-container">
-      <p class="app-footer-love">ساخته‌‌شده با <span aria-label="عشق">❤️</span> توسط آریا رامین</p>
+      <p class="app-footer-love">ساخته‌شده توسط آریا رامین</p>
       <div class="app-footer-meta">
-        <span id="app-version" class="app-footer-version"></span>
-        <span class="divider">·</span>
-        <a href="https://github.com/ariaramin/guilan-university-course-scheduler" class="app-footer-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span class="app-footer-love">این ابزار مستقل است و وابستگی رسمی به دانشگاه گیلان ندارد</span>
+        <!-- <a href="https://github.com/ariaramin/guilan-university-course-scheduler" class="app-footer-link"
+          target="_blank" rel="noopener noreferrer">GitHub</a> -->
       </div>
+      <span id="app-version" class="app-footer-version"></span>
     </div>
   </footer>
 
@@ -157,7 +232,7 @@
     <div id="course-detail"></div>
   </dialog>
 
-  <script src="vendor/mammoth.browser.min.js"></script>
   <script type="module" src="dashboard.js"></script>
 </body>
+
 </html>

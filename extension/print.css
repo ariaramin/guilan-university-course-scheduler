@@ -138,14 +138,14 @@ th {
 
 th:nth-child(1),
 td:nth-child(1) {
-    width: 14%;
+    width: 16%;
 }
 
 th:nth-child(3),
 td:nth-child(3),
 th:nth-child(4),
 td:nth-child(4) {
-    width: 18%;
+    width: 20%;
 }
 
 

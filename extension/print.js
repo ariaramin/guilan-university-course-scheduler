@@ -17,7 +17,16 @@ function table(headers, rows) {
   const body = document.createElement('tbody');
   for (const row of rows) {
     const tableRow = document.createElement('tr');
-    for (const cell of row) tableRow.append(element('td', cell));
+    for (const cell of row) {
+      const td = document.createElement('td');
+      if (cell instanceof HTMLElement) {
+        td.append(cell);
+      } else {
+        td.textContent = cell;
+        td.style.whiteSpace = 'pre-line';
+      }
+      tableRow.append(td);
+    }
     body.append(tableRow);
   }
   value.append(head, body);
@@ -47,14 +56,31 @@ try {
     header.append(logo, identity);
     article1.append(header, element('p', `مجموع واحد: ${program.units}`, 'print-meta'));
     article1.append(table(
-      ['نام درس', 'نام استاد', 'زمان کلاس', 'زمان و مکان امتحان', 'مقطع', 'ترم', 'ظرفیت باقی‌مانده', 'شهریه'],
-      program.courses.map((course) => [course.title, course.instructor, course.sessions, course.exam, course.degree, course.term, course.capacity, course.tuition]),
+      ['نام درس', 'نام استاد', 'زمان کلاس', 'زمان و مکان امتحان', 'مقطع', 'ترم', 'ظرفیت باقی‌مانده'],
+      program.courses.map((course) => [course.title, course.instructor, course.sessions, course.exam, course.degree, course.term, course.capacity]),
     ));
     root.append(article1);
 
     const article2 = element('article', null, 'program page-2');
     article2.append(element('h2', 'برنامه هفتگی'));
-    article2.append(table(['روز', 'کلاس‌ها'], program.week.map((day) => [day.day, day.entries.join('\n')])));
+    article2.append(table(['روز', 'کلاس‌ها'], program.week.map((day) => {
+      const cellContent = document.createElement('div');
+      cellContent.style.whiteSpace = 'pre-line';
+      
+      const classesText = document.createElement('div');
+      classesText.textContent = day.entries.join('\n');
+      cellContent.append(classesText);
+      
+      if (day.gapLine) {
+        const gapText = document.createElement('div');
+        gapText.textContent = `(${day.gapLine})`;
+        gapText.style.fontSize = '0.75rem';
+        gapText.style.color = '#66736E';
+        gapText.style.marginTop = '4px';
+        cellContent.append(gapText);
+      }
+      return [day.day, cellContent];
+    })));
     root.append(article2);
   }
   status.textContent = 'فایل برنامه با موفقیت آماده شد.';
